@@ -36,9 +36,29 @@ Now add an entry to `/etc/hosts` that changes the DNS resolution of `google.com`
 - Try running `curl google.com` again. What happens?
 
 # resolv.conf
-- manual lookups
+The next place an operating system will look for a hostname is the default nameserver configured on the system. In Linux and OSX this is configured in `/etc/resolv.conf`
+
+Get the IP address of your VM's default nameserver by looking at `/etc/resolv.conf`:
+- `cat /etc/resolv.conf`
+
+You can use the `dig` utility to manually lookup hostnames (and other DNS records, which will be covered in another lab). Try these:
+- `dig google.com`
+- `dig amazon.com`
+- `dig github.com`
+- `dig twitch.tv`
+
+- Note that some of these have multiple entries. When this happens, your system will pick one to perform other requests with. These specifics will be covered later, just know it's often the case.
+- Note that google.com will provide you with the real IP for one of google's servers, and not `127.0.0.1` as we placed in `/etc/hosts`. This is because dig ignores `/etc/hosts` and by default will start with querying the system's default nameserver.
+
+With `dig`, you can specify the nameserver to query by appending `@[ip address]` to the end of the command.
+- Try this with the IP address in your VM's `/etc/resolv.conf`
+- Now try it with some other publicly known nameservers:
+  - `8.8.8.8` (these are Google's)
+  - `8.8.4.4`
+- Are there any differences in the results?
 
 # trivia
 - In Windows, the hosts file is located in C:\Windows\System32\Drivers\etc\hosts. Do you notice anything familiar about this path?
 - OSX uses the same path for the hosts file as Linux
 - `127.0.0.1` is known as loopback TODO: networking 101
+- Vagrant does a lot for you. The nameserver set up in `/etc/resolv.conf` in the VM is simply forwarding requests to your host OS. Try running queries against your host OS nameservers. Are there any differences? 
