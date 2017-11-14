@@ -10,3 +10,6 @@ The provided `Vagrantfile` will create two virtual machines for this lab:
 
 To access one of the machines, you'll need to specify which by providing the name of the machine when invoking `vagrant ssh`:
 `vagrant ssh client`
+
+# dnsmasq
+
