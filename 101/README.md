@@ -58,7 +58,7 @@ With `dig`, you can specify the nameserver to query by appending `@[ip address]`
 - Are there any differences in the results?
 
 # trivia
-- In Windows, the hosts file is located in C:\Windows\System32\Drivers\etc\hosts. Do you notice anything familiar about this path?
+- In Windows, the hosts file is located in `C:\Windows\System32\Drivers\etc\hosts`. Do you notice anything familiar about this path?
 - OSX uses the same path for the hosts file as Linux
-- `127.0.0.1` is known as loopback TODO: networking 101
+- `127.0.0.1` is known as the loopback or `localhost` address. Most operating systems will have an entry in their hosts file pointing `127.0.0.1` to the hostname `localhost`
 - Vagrant does a lot for you. The nameserver set up in `/etc/resolv.conf` in the VM is simply forwarding requests to your host OS. Try running queries against your host OS nameservers. Are there any differences? 
