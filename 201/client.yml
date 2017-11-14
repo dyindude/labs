@@ -1,0 +1,9 @@
+---
+- hosts: all
+  tasks:
+    - name: install client packages
+      apt:
+        name: "{{ item }}"
+        state: present
+      with_items:
+        - dnsutils

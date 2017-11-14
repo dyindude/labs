@@ -1,0 +1,9 @@
+---
+- hosts: all
+  tasks:
+    - name: install server packages
+      apt:
+        name: "{{ item }}"
+        state: present
+      with_items:
+        - dnsmasq
