@@ -9,5 +9,6 @@ When done with the lab, be sure to exit your shell and run `vagrant destroy` fro
 
 # contact
 If you're having trouble with the setup or a lab, feel free to reach out to me on twitch or twitter:
-https://twitch.tv/dyindude
-https://twitter.com/dyindude
+
+- https://twitch.tv/dyindude
+- https://twitter.com/dyindude
