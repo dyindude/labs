@@ -7,9 +7,16 @@
         state: present
       with_items:
         - dnsmasq
-    - name: allow port 53 tcp and udp in ufw
-      ufw:
-        rule: allow
-        proto: any
-        direction: in
-        port: 53
+    - name: install conf file for dnsmasq
+      copy:
+        src: bogus-nxdomains
+        dest: /etc/dnsmasq.d/bogus-nxdomains
+        owner: root
+        group: root
+        mode: 0644
+      notify: restart dnsmasq
+  handlers:
+    - name: restart dnsmasq
+      service:
+        name: dnsmasq
+        state: restarted
