@@ -1,4 +1,4 @@
-# dns 201
+# dns 201-dnsmasq
 In this lab we'll be covering some initermediate topics related to DNS:
 - taking a look at how a few different DNS server software packages work
   - dnsmasq
@@ -46,3 +46,10 @@ Now let's add the hostname for `client` to the `/etc/hosts` file on `server`, re
       # service dnsmasq restart
 
 - After completing this, go back to `client` and try querying `server` for the resolution of `dns-lab201-client`
+
+# trivia
+- DNS also exists for pointing resolution of IP addresses back to hostnames. This is commonly referred to as "Reverse" DNS.
+  - By passing the `-x` flag to `dig`, you can perform reverse DNS lookups.
+  - Try performing reverse DNS lookups on the IPs you got from the results of your queries in exercise 1
+    - then try performing forward lookups on the hostnames you get back from those results
+    - What do you think is interesting about the results here?
