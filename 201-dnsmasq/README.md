@@ -48,3 +48,8 @@ Now let's add the hostname for `client` to the `/etc/hosts` file on `server`, re
   - Try performing reverse DNS lookups on the IPs you got from the results of your queries in exercise 1
     - then try performing forward lookups on the hostnames you get back from those results
     - What do you think is interesting about the results here?
+
+# Further reading
+- https://en.wikipedia.org/wiki/Dnsmasq
+- http://manpages.ubuntu.com/manpages/trusty/man8/dnsmasq.8.html
+- https://help.ubuntu.com/community/Dnsmasq

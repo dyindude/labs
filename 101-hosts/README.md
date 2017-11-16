@@ -62,3 +62,8 @@ With `dig`, you can specify the nameserver to query by appending `@[ip address]`
 - OSX uses the same path for the hosts file as Linux
 - `127.0.0.1` is known as the loopback or `localhost` address. Most operating systems will have an entry in their hosts file pointing `127.0.0.1` to the hostname `localhost`
 - Vagrant does a lot for you. The nameserver set up in `/etc/resolv.conf` in the VM is simply forwarding requests to your host OS. Try running queries against your host OS nameservers. Are there any differences? 
+
+# Further reading
+- https://en.wikipedia.org/wiki/Hosts_(file)
+- http://manpages.ubuntu.com/manpages/zesty/man5/hosts.5.html
+
