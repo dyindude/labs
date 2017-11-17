@@ -1,4 +1,4 @@
-# dns 101-hosts
+# DNS 101-hosts
 - This lab will walk you through a variety of basics when it comes to understanding how DNS names are resolved in Linux.
 - Keep in mind that many of these concepts apply in other operating systems, but usually using different tools
 

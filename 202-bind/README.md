@@ -1,5 +1,5 @@
-# dns 202-named
-In this lab we'll be standing up two machines, a client to perform DNS requests from, and a server running `bind` as a nameserver. Below are the IP addresses of both machines in this lab.
+# DNS 202-named
+In this lab we'll be standing up two machines, a client from which to perform DNS requests, and a server running `named` as a nameserver. Below are the IP addresses of both machines in this lab.
 - `server - 172.27.27.27`
 - `client - 172.27.27.28`
 
@@ -9,7 +9,7 @@ To access one of the machines, you'll need to specify which by providing the nam
 # named
 `named` is a general purpose nameserver. For many years it was the de-facto standard for nameservers in Unix/Linux. It has a powerful suite of options available, but its configuration syntax can be difficult to understand and troubleshoot if you aren't familiar with it.
 
-- `named` stands for nameserver daemon, and is a part of the `bind` suite of utilities. These names are often used interchangeably.
+- `named` stands for nameserver daemon, and is a part of the `bind` suite of utilities. These names are often colloquially used interchangeably.
 - Records for domains are organized into files called `zone` files
   - a `zone` file controls the resolution hostnames, including the root domain and `subdomains` of that `zone`
 
@@ -31,19 +31,19 @@ Here's an example zone file:
     cname-server.lab202.dyindude.   IN      CNAME   server.lab202.dyindude.
     cname-client.lab202.dyindude.   IN      CNAME   client.lab202.dyindude.
 
-Remember that the syntax of zone files is strict, and a typo in them can cause DNS to fail for the entire zone.
+Remember that the syntax for zone files is strict, and a typo in them can cause DNS to fail for the entire zone.
 Here are some definitions:
 
 - `TTL` - **Time to Live** is a concept that is present not only in DNS, but also in lower level networking protocols like TCP/IP. In the case of DNS, this describes the minimum amount of time in seconds that a client requesting information about this zone can expect it to be valid.
 - `@` - When reading a zone file, `@` is used to indicate the root domain of the zone file. In the case of this zone, `@` is equivalent to `lab202.dyindude`.
 - `IN` - Defines that an entry in the zone file is an **IN**ternet class record.
 - `SOA` - **Start of Authority** 
-  - `dns-lab202-server.` - `MNAME` - is a deprecated record type - https://serverfault.com/questions/85408/soa-and-primary-ns-record-dns https://tools.ietf.org/html/draft-jabley-dnsop-missing-mname-00  the hostname of a nameserver that is authoritative for the zone, meaning that other servers in a DNS request chain will defer to this server after all caches have been exhausted due to `TTL` expiry (need better wording, and maybe an example). In this case, the hostname is the same as this server's.
+  - `dns-lab202-server.` - `MNAME` - is a deprecated record type<sup>1</sup> that is now only used for updating dynamic DNS records (such as with DHCP in home networks). It indicates an authoritative source for DNS records for the zone. In practice, this record has been superseded by `NS` records for Internet class records.
   - `admin.lab202.dyindude.` - `Mailing address` - the e-mail address of administrators responsible for the domain.
     - Since `@` is a special character representing the root domain of the zone, in a zone file convention it is replaced with another `.` symbol.
-    - If there is a literal `.` in the username of the email address, it must be escaped in this field with `\\`.
+    - If there is a literal `.` in the username of the email address, it must be escaped in this field with `\`.
       - For example, in the case of `admin@lab202.dyindude`, the entry in the zone file is `admin.lab202.dyindude.com`
-      - In the case of an email address like `dns.admin@lab202.dyindude`, the entry in the zone file would be `dns\\.admin.lab202.dyindude.com`
+      - In the case of an email address like `dns.admin@lab202.dyindude`, the entry in the zone file would be `dns\.admin.lab202.dyindude.com`
 
 The following values are used to control the behavior of how often slave nameservers attempt to sync information with their masters:
 - `Serial` - Indicates the version of the zone file. If a slave nameserver sees this number has incremented, it knows it's time to refresh the zone.
@@ -128,6 +128,7 @@ Now that your zone is set up, move to `client` and perform dns lookups on the ho
 
 
 # Further reading
+- https://serverfault.com/questions/85408/soa-and-primary-ns-record-dns https://tools.ietf.org/html/draft-jabley-dnsop-missing-mname-00 <sup>1</sup>
 - https://en.wikipedia.org/wiki/Time_to_live
 - https://en.wikipedia.org/wiki/SOA_Resource_Record
 - https://tools.ietf.org/html/rfc1035

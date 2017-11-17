@@ -1,4 +1,4 @@
-# dns 201-dnsmasq
+# DNS 201-dnsmasq
 In this lab we'll be standing up two machines, a client to perform DNS requests from, and a server running `dnsmasq` as a nameserver. Below are the IP addresses of both machines in this lab.
 - `server - 172.27.27.27`
 - `client - 172.27.27.28`
