@@ -117,15 +117,6 @@ Now that your zone is set up, move to `client` and perform dns lookups on the ho
 - In practice, regardless of how low you've set your TTL, it can take a full 72 hours for DNS changes in a zone to propagate throughout the internet, unless you are using a higher-priority service provider for DNS like AWS.
 - Many nameserver administrators/ISPs have configured their nameservers to filter out extremely low and high TTL values, and in some cases ignore the TTLs in zone records altogether, enforcing their own standards for TTL. This accounts for variances in the completion of DNS propagation.
 
-# WIP notes plz ignore
-- Root DNS servers - ref: https://www.iana.org/domains/root/servers
-- There are a lot of TLDs these days,
-  ~~but some have been reserved as "local" domains~~
-  nope bruh, no one seems to know: https://en.wikipedia.org/wiki/.local
-
-  glue records? (more advanced topic, we haven't gotten to setting up a real domain yet)
-  what are the other zone classes? (IN for Internet)
-
 
 # Further reading
 - https://serverfault.com/questions/85408/soa-and-primary-ns-record-dns https://tools.ietf.org/html/draft-jabley-dnsop-missing-mname-00 <sup>1</sup>
