@@ -45,7 +45,8 @@ Here are some definitions:
       - For example, in the case of `admin@lab202.dyindude`, the entry in the zone file is `admin.lab202.dyindude.com`
       - In the case of an email address like `dns.admin@lab202.dyindude`, the entry in the zone file would be `dns\.admin.lab202.dyindude.com`
 
-The following values are used to control the behavior of how often slave nameservers attempt to sync information with their masters:
+The following values are used to control the behavior of how often slave nameservers attempt to sync information with their masters. The configuration of this lab only includes a single nameserver, so these values are not relevant right now. They are still worth being aware of and we'll come back to them in another lab.
+
 - `Serial` - Indicates the version of the zone file. If a slave nameserver sees this number has incremented, it knows it's time to refresh the zone.
 - `Refresh` - The length of time in seconds a slave nameserver should wait before asking the master whether or not the `Serial` has been incremented and the zone needs to be refreshed.
 - `Retry` - The length of time in seconds a slave nameserver should wait to retry a connection to the master if it encounters a timeout on any request.
@@ -59,9 +60,7 @@ The following values are used to control the behavior of how often slave nameser
 
 - Like `dnsmasq`, it supports both forward and reverse zones. 
 - DNS lookups can be performed against it (nameserver)
-- If a name isn't found in it's configuration or the cache from a previous request, it can forward the request to an external nameserver (caching, forwarding)
-- It's useful for simple setups, home office networks due to its simplistic configuration
-  - By default, it will respond to names in the server's own `/etc/hosts` file, as well as names explicitly defined in its configuration files
+- Its default configuration is more explicit, and a zone file must be created before any queries can be ran against it (no `/etc/hosts` lookups)
 
 # Exercise 1
 This exercise will be similar to the exercises in the last lab. Log onto `client` with `vagrant ssh client`.
@@ -95,7 +94,7 @@ The files included here are:
 
 - `named.conf.options` - has the `options{};` configuration block containing nameserver-wide options.
 - `named.conf.local` - includes information about the zones local to this machine. This is where you'll place your custom zone configuration.
-- `named.conf.default-zones` - contains hints to the root DNS servers ##expound on this somewhere, as well as reverse DNS entries for `localhost` IP addresses to avoid some edge-case DNS misconfiguration errors. #citation needed
+- `named.conf.default-zones` - contains hints to the root DNS servers, as well as reverse DNS entries for `localhost` IP addresses.
 
 Open `named.conf.local` in the command line editor of your choice (`vim`, `nano`, etc)
 Create a new zone configuration in the lines below the zone for `lab202.dyindude` using your desired hostname.
@@ -115,7 +114,8 @@ Now that your zone is set up, move to `client` and perform dns lookups on the ho
 
 # Trivia
 - As stated in the summary, `named` is the `nameserver daemon`. `bind` stands for the Berkeley Internet Name Domain, which includes a number of other utilities including `named`.
-- Many nameserver administrators have configured their nameservers to not honor TTL if the number is lower than their standard, which can cause variances in the completion of DNS propagation.
+- In practice, regardless of how low you've set your TTL, it can take a full 72 hours for DNS changes in a zone to propagate throughout the internet, unless you are using a higher-priority service provider for DNS like AWS.
+- Many nameserver administrators/ISPs have configured their nameservers to filter out extremely low and high TTL values, and in some cases ignore the TTLs in zone records altogether, enforcing their own standards for TTL. This accounts for variances in the completion of DNS propagation.
 
 # WIP notes plz ignore
 - Root DNS servers - ref: https://www.iana.org/domains/root/servers
