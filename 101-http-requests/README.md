@@ -49,8 +49,12 @@ Try the same with a few other hostnames you may recognize:
 - `www.twitch.tv`
 - `www.twitter.com`
 
+Try loading `http://172.27.27.27/` in your web browser. Open your browser's developer tools and refresh the page. Compare the headers you see to the ones you got in the terminal.
+
 # Trivia
 - Using `HEAD` as your request method instructs the server to only return the headers of the request. This can be useful when troubleshooting if you just want to check for the response code or look for a specific response header and don't necessarily care about seeing the full content of the page in your terminal.
 - Data stored in the headers of a request is not shown in the main view of most web browsers. It's important to understand that the headers and content are served up separately - the content is what is displayed to the user, the headers can be used to store information for the frontend application to use (session ID, for example)
+- The headers you get in a browser may be different from the ones you get doing it with `netcat` or `curl`, because no `User-Agent` header has been set. `User-Agent` is a header implemented by most web browsers to indicate the software and version of the software to make the request, to help web developers design webpages that render similarly regardless of which browser is making the request.
+
 # Further reading
 - https://www.ietf.org/rfc/rfc2616.txt
