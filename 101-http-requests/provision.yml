@@ -11,7 +11,7 @@
       file:
         name: /var/www/html/index.nginx-debian.html
         state: absent
-    - name: add our google.com template
+    - name: add our web files
       copy:
         src: index.html
         dest: /var/www/html/index.html
