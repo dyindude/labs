@@ -1,0 +1,14 @@
+$TTL    604800
+@       IN      SOA     dns-lab202-server. admin.lab202.dyindude. (
+                              4         ; Serial
+                         604800         ; Refresh
+                          86400         ; Retry
+                        2419200         ; Expire
+                         604800 )       ; Negative Cache TTL
+; NS records
+        IN      NS      dns-lab202-server.
+; Zone records
+server.lab202.dyindude.         IN      A       172.27.27.27
+client.lab202.dyindude.         IN      A       172.27.27.28
+cname-server.lab202.dyindude.   IN      CNAME   server.lab202.dyindude.
+cname-client.lab202.dyindude.   IN      CNAME   client.lab202.dyindude.

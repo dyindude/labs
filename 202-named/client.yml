@@ -1,0 +1,20 @@
+---
+- hosts: all
+  tasks:
+    - name: install client packages
+      apt:
+        name: "{{ item }}"
+        state: present
+      with_items:
+        - dnsutils
+    - name: override DHCP dns with the server IP
+      lineinfile:
+        path: /etc/dhcp/dhclient.conf
+        line: "supersede domain-name-servers 172.27.27.27;"
+        state: present
+      notify: restart networking
+  handlers:
+    - name: restart networking
+      service:
+        name: networking
+        state: restarted

@@ -36,7 +36,7 @@ Here are some definitions:
 
 - `TTL` - **Time to Live** is a concept that is present not only in DNS, but also in lower level networking protocols like TCP/IP. In the case of DNS, this describes the minimum amount of time in seconds that a client requesting information about this zone can expect it to be valid.
 - `@` - When reading a zone file, `@` is used to indicate the root domain of the zone file. In the case of this zone, `@` is equivalent to `lab202.dyindude`.
-- `IN` - Defines that an entry in the zone file is an **IN**ternet class record.
+- `IN` - Defines that an entry in the zone file is an **IN**ternet class record.<sup>2</sup>
 - `SOA` - **Start of Authority** 
   - `dns-lab202-server.` - `MNAME` - is a deprecated record type<sup>1</sup> that is now only used for updating dynamic DNS records (such as with DHCP in home networks). It indicates an authoritative source for DNS records for the zone. In practice, this record has been superseded by `NS` records for Internet class records.
   - `admin.lab202.dyindude.` - `Mailing address` - the e-mail address of administrators responsible for the domain.
@@ -116,6 +116,7 @@ Now that your zone is set up, move to `client` and perform dns lookups on the ho
 - As stated in the summary, `named` is the `nameserver daemon`. `bind` stands for the Berkeley Internet Name Domain, which includes a number of other utilities including `named`.
 - In practice, regardless of how low you've set your TTL, it can take a full 72 hours for DNS changes in a zone to propagate throughout the internet, unless you are using a higher-priority service provider for DNS like AWS.
 - Many nameserver administrators/ISPs have configured their nameservers to filter out extremely low and high TTL values, and in some cases ignore the TTLs in zone records altogether, enforcing their own standards for TTL. This accounts for variances in the completion of DNS propagation.
+- <sup>2</sup> The `IN` class for a DNS record is the only class in relavent use with modern DNS. Some references indicate that this field is optional and `IN` is assumed if it isn't present. Ref: https://serverfault.com/questions/220775/what-does-the-in-mean-in-a-zone-file
 
 
 # Further reading

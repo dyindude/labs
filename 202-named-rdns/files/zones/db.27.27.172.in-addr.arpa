@@ -1,0 +1,12 @@
+$TTL    604800
+@       IN      SOA     dns-lab202-server. admin.lab202.dyindude. (
+                              1         ; Serial
+                         604800         ; Refresh
+                          86400         ; Retry
+                        2419200         ; Expire
+                         604800 )       ; Negative Cache TTL
+; NS records
+        IN      NS      dns-lab202-server.
+; Zone records
+27                              IN      PTR     server.lab202.dyindude.
+28                              IN      PTR     client.lab202.dyindude.
