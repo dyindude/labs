@@ -1,0 +1,25 @@
+<html>
+    <head><title>some webpage dot com</title></head>
+    <body>
+        <div style="width:40%;display: inline-block;">
+            <div class="fullObject_label">fullObject: </div>
+            <div class="fullObject">some content</div>
+            <div class="someID_label">someID: </div>
+            <div class="someID"></div>
+            <div class="someOtherID_label">someOtherID: </div>
+            <div class="someOtherID"></div>
+            <div class="anotherID_label">anotherID: </div>
+            <div class="anotherID"></div>
+        </div>
+        <div>
+            <textarea class="data" style="width:600px;height:200px;">{
+  "someID": "foo",
+  "someOtherID": "bar",
+  "anotherID": "baz"
+}</textarea>
+            <button onclick="postData(JSON.parse($('.data').val()))">submit</button>
+        </div>
+    </body>
+    <script src="jquery.js"></script>
+    <script src="js.js"></script>
+</html>

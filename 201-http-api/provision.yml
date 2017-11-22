@@ -1,0 +1,59 @@
+---
+- hosts: all
+  tasks:
+    - name: install packages for this lab
+      apt:
+        name: "{{ item }}"
+        state: present
+      with_items:
+        - nginx
+        - nodejs
+        - npm
+    - name: install npm packages for this lab
+      npm:
+        name: "{{ item }}"
+        global: yes
+      with_items:
+        - nodemon
+        - forever
+    - name: symlink /usr/bin/nodejs to /usr/bin/node
+      file:
+        src: /usr/bin/nodejs
+        dest: /usr/bin/node
+        state: link
+    - name: start app
+      shell: "forever start index.js && touch /tmp/app.started"
+      args:
+        chdir: /vagrant/files/app
+        creates: /tmp/app.started
+      become: true
+      become_user: ubuntu
+    - name: remove default nginx index
+      file:
+        name: /var/www/html/index.nginx-debian.html
+        state: absent
+    - name: proxy_pass in nginx conf
+      blockinfile:
+        insertafter: '^.*server_name _'
+        block: |
+          location /api {
+              proxy_pass http://127.0.0.1:3000/api;
+          }
+        path: /etc/nginx/sites-available/default
+      notify: restart nginx
+    - name: add our web files
+      copy:
+        src: "static/{{ item }}"
+        dest: "/var/www/html/{{ item }}"
+        owner: root
+        group: root
+        mode: 0644
+      with_items:
+        - index.html
+        - jquery.js
+        - js.js
+  handlers:
+    - name: restart nginx
+      service:
+        name: nginx
+        state: restarted
