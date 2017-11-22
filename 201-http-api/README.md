@@ -2,68 +2,76 @@
 
 In this lab, we'll be performing requests against a simple API endpoint that has been configured to return the same JSON payload that is `POST` to it. We'll do requests from the command line on the server, and try it out from the browser as well.
 
-
 # Setup
 - If you haven't already, follow the instructions in https://github.com/dyindude/vagrant-lab to install VirtualBox and Vagrant
 - Download a copy of this repo, navigate to its folder and run `vagrant up`, followed by `vagrant ssh`
 - You'll now be in a shell of a virtual machine configured for this lab.
 - When you're done, if something in the lab messes up, or you just want to restart from scratch, type `exit` in the terminal to leave the SSH connection and run `vagrant destroy` from the project folder 
 
-# It's all (mostly) text!
-Something that wasn't very apparent to me when I started working with web services is the fact that most requests and responses served up by an HTTP server is simply text being sent to/from the server.
+# JSON
 
-Binary data, such as images, are sent in their binary form - but these are handled in separate requests by your web browser. #wording?
+Many modern APIs return data in `JSON` (**J**ava**S**cript **O**bject **N**otation) format. This is because the most common consumer of data from those APIs in a web browser are frontend applications written in JavaScript.
 
-A very basic request from an HTTP client is in the form of `GET /`, which instructs the server to return the content of the data stored at `/` (often called the `root` of a website, since it is analogous to the `root` folder of a linux filesystem.
+This Vagrantfile provided with this lab sets up a simple node.js api endpoint at `/api` that returns the same data you provide to it via `POST`.
 
-Because it's all text, you can recreate requests with common utilities such as `netcat` and `telnet` to reproduce issues or aid in troubleshooting (or in the case of this lab, just seeing how it all works)
+The `JSON` payloads we'll be working with in this example are relatively simple key-value pairs:
 
-`netcat` is a utility that allows you to type text (in this case. `netcat` also supports reading from `stdin`, so you could pipe output from another command, a text file, etc to its input and send it over) and send it to the designated hostname/IP on the specified port. The system in this lab has a basic webserver running on it, so you can send requests to `localhost` on the default HTTP port `80`.
+```
+{ "user": "test" }
+
+{
+  "someID": "foo",
+  "someOtherID": "bar",
+  "anotherID": "baz"
+}
+```
 
 # Exercise 1
+
 Get into a shell of the system provided with this lab by running `vagrant ssh`.
 
-Using `netcat`, initiate a connection to `localhost` on port `80`:
+With `curl`, you can provide data to a `POST` request by appending the `-d` flag in the command, followed by the `data` you wish to submit with the request.
 
-`$ nc localhost 80`
+Start by providing a simple `JSON` object assigning the value of `test` to the key `name`:
 
-After hitting enter, the prompt will move down one line, and you can type your request.
+`curl -XPOST -d '{"name": "test"}' http://localhost/api`
 
-- Type `GET /` followed by another `Enter`, and see the response you get back
-- Initiate another connection with `nc localhost 80`. Type `GET / HTTP/1.0` instead.
-  - You'll need to add another newline afterwards to terminate the request. Specifying `HTTP/1.0` in the request indicates that we may have some request headers to add to the request ##clarify/citation needed
-  - The output of this request will include what are called `response` headers
+You'll notice the output you receive is not the same as that which you provided. This is because no `Content-Type` header was included with the request. While some APIs may assume your input data to always be JSON, it's best practice to assume you have to specify the type of data you are sending by providing `application/json` in a `Content-Type` header.
 
-- Try all of this again using `HEAD` instead of `GET` in your requests
+With `curl`, request headers can be provided using the `-H` flag. Multiple headers can be passed in the same invocation of `curl` if necessary (e.g. `curl -H "header1: foo" -H "header2: bar"`)
+
+Try the same request above, appending the `Content-Type` header to the command:
+
+`curl -XPOST -H "Content-Type: application/json" -d '{"name": "test"}' http://localhost/api`
+
+If you've provided a valid JSON object as the `POST` data, you should receive the same output as provided in the input.
+
+Try this again with a more complex object, like `{ "someID": "foo", "someOtherID": "bar", "anotherID": "baz" }` and see what you get.
 
 # Exercise 2
-In the same shell, take a look at the content of the page and its headers using `curl`:
 
-`$ curl http://localhost`
+Along with the simple API endpoint, a web application is listening on the server at http://172.27.27.27
 
-With curl, you can request only the `headers` of the response with the `-I` or `--head` flag:
+Open this page in your browser. You'll see that by clicking the `submit` button, the values for `someID`, `someOtherID`, and `anotherID` are updated on the page.
 
-`$ curl -I http://localhost`
+- Try providing other values for `someID`, `someOtherID`, `anotherID`.
+- Try providing other values in your payload.
+- Try removing `someID`, `someOtherID`, `anotherID` from your payload altogether.
+- Open your browser's dev console on the page. Construct a JSON object in a variable:
 
-Try the same with a few other hostnames you may recognize:
+  ```
+  var data = { "someID": "foolish", "someOtherID": "barter", "anotherID": "bazaar" }
+  ```
 
-- `www.google.com`
-- `www.twitch.tv`
-- `www.twitter.com`
+  One of the JavaScript functions defined in the webapp is called `postData()`, which will `POST` a provided variable (expecting a JSON object) to our API endpoint. Try providing `data` to this function and see what happens on the page:
 
-Try loading `http://172.27.27.27/` in your web browser. Open your browser's developer tools and refresh the page. Compare the headers you see to the ones you got in the terminal.
+  ```
+  postData(data)
+  ```
 
 # Trivia
-- Using `HEAD` as your request method instructs the server to only return the headers of the request. This can be useful when troubleshooting if you just want to check for the response code or look for a specific response header and don't necessarily care about seeing the full content of the page in your terminal.
-- Data stored in the headers of a request is not shown in the main view of most web browsers. It's important to understand that the headers and content are served up separately - the content is what is displayed to the user, the headers can be used to store information for the frontend application to use (session ID, for example)
-- The headers you get in a browser may be different from the ones you get doing it with `netcat` or `curl`, because no `User-Agent` header has been set. `User-Agent` is a header implemented by most web browsers to indicate the software and version of the software to make the request, to help web developers design webpages that render similarly regardless of which browser is making the request.
+- In Exercise 1, the data you got back from the server without `Content-Type: application/json` is still technically valid JSON. Why would it not be useful for you in an application?
 
-# Further reading
-- https://www.ietf.org/rfc/rfc2616.txt
-
-- GET endpoint
-- POST endpoint
-- stress importance of "Content-Type: application/json"
-- example command:  curl -XPOST -H "Content-Type: application/json" -d '{"name": "test"}' http://localhost/api
-
-
+# Further Reading
+- https://en.wikipedia.org/wiki/JSON
+- https://www.json.org/
