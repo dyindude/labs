@@ -14,17 +14,36 @@
         name: "{{ item }}"
         global: yes
       with_items:
-        - nodemon
         - forever
     - name: symlink /usr/bin/nodejs to /usr/bin/node
       file:
         src: /usr/bin/nodejs
         dest: /usr/bin/node
         state: link
+    - name: create /app folder
+      file:
+        dest: /app
+        state: directory
+        owner: ubuntu
+        group: ubuntu
+        mode: 0755
+    - name: install app to /app
+      copy:
+        src: files/app/
+        dest: /app/
+        owner: ubuntu
+        group: ubuntu
+    - name: install node_modules for app
+      shell: "npm install && touch /tmp/app.installed"
+      args:
+        chdir: /app
+        creates: /tmp/app.installed
+      become: true
+      become_user: ubuntu
     - name: start app
       shell: "forever start index.js && touch /tmp/app.started"
       args:
-        chdir: /vagrant/files/app
+        chdir: /app
         creates: /tmp/app.started
       become: true
       become_user: ubuntu
