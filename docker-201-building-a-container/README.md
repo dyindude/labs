@@ -1,73 +1,110 @@
 # docker 201-building-a-container
-- This lab will walk you through taking an existing webapp and writing a Dockerfile/building a container for it.
-
-- simple-api-http
-
-- docker run
-- docker-compose
+This lab will walk you through taking an existing webapp and writing a Dockerfile/building a container for it.
+We'll start by examining a `Dockerfile` and `docker-compose.yml` built for the app used in the `201-http-api` lab.
 
 # Setup
 - If you haven't already, follow the instructions in https://github.com/dyindude/vagrant-lab to install VirtualBox and Vagrant
 - Download a copy of this repo, navigate to its folder and run `vagrant up`, followed by `vagrant ssh`
 - You'll now be in a shell of a virtual machine configured for this lab.
-- Many of the examples in this lab will require root access, so please run `sudo -i` after you gain shell access to the VM
-- When you're done, if something in the lab messes up, or you just want to restart from scratch, type `exit` in the terminal to leave the SSH connection and run `vagrant destroy` from the project folder 
+- When you're done, if something in the lab messes up, or you just want to restart from scratch, type `exit` in the terminal to leave the SSH connection and run `vagrant destroy` from the project folder
 
-# Hosts file
-The first place most operating systems look for resolving hostnames is in the hosts file. Take a look at `/etc/hosts` by running `cat /etc/hosts`
+Log into the system for this lab with `vagrant ssh`, and take a look at the files in the `simple-http-api` folder:
 
-Each line starts with an IP address, followed by a list of hostnames that should resolve to that IP.
-`127.0.0.1       dns-lab101      dns-lab101`
+```
+app                 # node.js application with our simple API
+docker-compose.yml  # docker-compose configuration
+Dockerfile          # the Dockerfile for this lab
+nginx-default.conf  # nginx container configuration file
+                    # (used in docker-compose.yml)
+static              # static files for the frontend of the webapp
+                    # (used in docker-compose.yml)
+```
 
-## Ping test
-To demonstrate this, try pinging both a hostname that isn't in the `hosts` file, followed by one that is:
-- `ping dns-lab999`
-- `ping dns-lab101`
 
-You'll see that pinging `dns-lab999` results in no response (hit ctrl+c to cancel)
-You'll see that pinging `dns-lab101` results in a response from `127.0.0.1`
+# Dockerfile
+Much like `Vagrantfile`s are used to describe the configuration of a virtual machine, `Dockerfiles` are simple files used to describe the configuration of Docker containers.
 
-## Hostname "poisoning"
-Sometimes you'll see documentation refer to hostname 'poisoning' via `/etc/hosts`. This is accomplished by placing a hostname in `/etc/hosts` that would normally be resolved by your local nameservers instead.
+Let's take a look at `simple-http-api/Dockerfile`:
 
-Before poisoning your hosts file for `google.com`, try using `curl` to get a response from google's own servers:
-- `curl google.com`
-You'll see the raw HTML output, which in this case indicates a redirect to `www.google.com`
+```
+FROM alpine:latest
 
-Now add an entry to `/etc/hosts` that changes the DNS resolution of `google.com` to `127.0.0.1`
-- `echo 127.0.0.1 google.com >> /etc/hosts`
-  - Note: it's important to use double `>>` in this case
-- Try running `curl google.com` again. What happens?
+WORKDIR /app
 
-# resolv.conf
-The next place an operating system will look for a hostname is the default nameserver configured on the system. In Linux and OSX this is configured in `/etc/resolv.conf`
+COPY app/ /app/
 
-Get the IP address of your VM's default nameserver by looking at `/etc/resolv.conf`:
-- `cat /etc/resolv.conf`
+RUN apk -Uuv add nodejs nodejs-npm && \
+    npm install -g nodemon && \
+    npm install
 
-You can use the `dig` utility to manually lookup hostnames (and other DNS records, which will be covered in another lab). Try these:
-- `dig google.com`
-- `dig amazon.com`
-- `dig github.com`
-- `dig twitch.tv`
+EXPOSE 3000
 
-- Note that some of these have multiple entries. When this happens, your system will pick one to perform other requests with. These specifics will be covered later, just know it's often the case.
-- Note that google.com will provide you with the real IP for one of google's servers, and not `127.0.0.1` as we placed in `/etc/hosts`. This is because dig ignores `/etc/hosts` and by default will start with querying the system's default nameserver.
+CMD [ "nodemon", "index.js" ]
+```
 
-With `dig`, you can specify the nameserver to query by appending `@[ip address]` to the end of the command. #not needed if you querying default nameserver bruv
-- Try this with the IP address in your VM's `/etc/resolv.conf`
-- Now try it with some other publicly known nameservers:
-  - `8.8.8.8` (these are Google's)
-  - `8.8.4.4`
-- Are there any differences in the results?
+- *FROM* - this line indicates the base container image we'll be working with, in this case `alpine` with the tag `latest`
+- *WORKDIR* - specifies the directory from which other commands in the Dockerfile will be ran during the build process
+- *COPY* - copies specified files and/or folders from our working directory into the specified path in the container
+- *RUN* - runs shell commands from within the container during the **build** process. It's important to understand that this directive is during the build context, and not while the container is running.
+- *EXPOSE* - defines which ports should be exposed by default to other running containers
+- *CMD* - defines the command that will be ran by the container when it starts. Unless you are packaging up a command line utility in a container, this should be a command which runs in the foreground and doesn't exit - otherwise your container will exit when the process exits.
+
+This is a simple example of a Dockerfile that can be used to run a node.js application (there are even simpler examples if you use the official node.js containers, but that makes it a little more difficult to explain the process)
+
+# Exercise 1
+
+Now that we've had a look inside the Dockerfile, let's build a copy of our container.
+
+From the `simple-http-api` folder, run the command:
+
+`$ docker build -t simple-http-api .`
+
+- `docker` - the `docker` command line utility is used to communicate with the `docker` daemon running either on the local machine or another machine
+- `build` - is the command we're using here, to `build` our container
+- `-t simple-http-api` - instructs the `build` command to `tag` the resulting container with the tag `simple-http-api`
+- `.` - the folder containing the `Dockerfile` that we want to `build`, in this case, the current folder (or `.`)
+
+As you watch the container build, you'll see the process step through each of the commands outlined in the Dockerfile.
+
+- try adding another package to install, such as `vim` to the Dockerfile and re-running the `docker build` command.
+- try copying another file in the container by adding the following line somewhere in `Dockerfile` before the `CMD` line:
+  `COPY nginx-default.conf /nginx-default.conf`
+- try to distinguish how this affects the `build` process. Where does it pick up from? (hint: `using cache` indicates that step of the `build` was cached from a previous version)
+
+Now run `docker images` to list the built container images you now have on the local machine. You should see an entry for both `alpine` (the image we used as the basis for our container), as well as the image we built - `simple-http-api`
+
+Run `docker run --rm -d -P simple-http-api`
+
+- `run` - tells `docker` that we want to `run` a container
+- `--rm` - we want to `rm` or `remove` the container after it exits (not the image - #expound on this)
+- `-d` - after launching our container as a daemon, the `docker` command will exit. Without this flag, the `docker` command will run the container in the foreground (useful for debugging)
+- `-P` - expose any ports defined in the `Dockerfile` with the `EXPOSE` directive to the host machine
+- `simple-http-api` - the name of the container `image` that we want to run
+
+After the `docker` command exits, it will provide a long string of letters and numbers indicating the ID of the newly launched container:
+
+`6a518a346351d6b6ad70a703c84cb74e07dd9a4ce9b35f2cc9b570bb7a383632`
+
+- You can use this ID when interacting with other `docker` commands to perform tasks on the running container.
+- Since this will be the only container running on the machine, you don't have to type out the full ID - you can get away with typing the first 3 or 4 characters and the command line utility is smart enough to complete the ID for you when referencing it internally.
+- In the next few examples, I'll be using `6a5` to indicate the container ID. When you work through this lab, be sure to use the first 3 characters of the ID shown on your screen.
+
+In case you've already lost or forgotten your ID, you can get information about running containers by running `docker ps`. The first field shown is the `CONTAINER ID`.
+
+
+# Exercise 2
+
+
+
 
 # Trivia
-- In Windows, the hosts file is located in `C:\Windows\System32\Drivers\etc\hosts`. Do you notice anything familiar about this path?
-- OSX uses the same path for the hosts file as Linux
-- `127.0.0.1` is known as the loopback or `localhost` address. Most operating systems will have an entry in their hosts file pointing `127.0.0.1` to the hostname `localhost`
-- Vagrant does a lot for you. The nameserver set up in `/etc/resolv.conf` in the VM is simply forwarding requests to your host OS. Try running queries against your host OS nameservers. Are there any differences? 
-
 # Further reading
-- https://en.wikipedia.org/wiki/Hosts_(file)
-- http://manpages.ubuntu.com/manpages/zesty/man5/hosts.5.html
+
+- https://docs.docker.com/engine/reference/builder/
+- https://docs.docker.com/engine/reference/run/
+- simple-api-http
+
+- docker run
+- docker-compose
+
 
