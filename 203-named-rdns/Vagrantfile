@@ -3,7 +3,7 @@
 Vagrant.configure("2") do |config|
   config.vm.box = "ubuntu/xenial64"
   config.vm.define "server" do |server|
-      server.vm.hostname = "dns-lab202-server"
+      server.vm.hostname = "dns-lab203-server"
       server.vm.network "private_network", ip: "172.27.27.27"
       server.vm.provision "ansible_local" do |ansible|
           ansible.playbook = "server.yml"
@@ -11,7 +11,7 @@ Vagrant.configure("2") do |config|
       end
   end
   config.vm.define "client" do |client|
-      client.vm.hostname = "dns-lab202-client"
+      client.vm.hostname = "dns-lab203-client"
       client.vm.network "private_network", ip: "172.27.27.28"
       client.vm.provision "ansible_local" do |ansible|
           ansible.playbook = "client.yml"

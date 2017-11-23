@@ -50,7 +50,7 @@ You can use the `dig` utility to manually lookup hostnames (and other DNS record
 - Note that some of these have multiple entries. When this happens, your system will pick one to perform other requests with. These specifics will be covered later, just know it's often the case.
 - Note that google.com will provide you with the real IP for one of google's servers, and not `127.0.0.1` as we placed in `/etc/hosts`. This is because dig ignores `/etc/hosts` and by default will start with querying the system's default nameserver.
 
-With `dig`, you can specify the nameserver to query by appending `@[ip address]` to the end of the command.
+With `dig`, you can specify the nameserver to query by appending `@[ip address]` to the end of the command. #not needed if you querying default nameserver bruv
 - Try this with the IP address in your VM's `/etc/resolv.conf`
 - Now try it with some other publicly known nameservers:
   - `8.8.8.8` (these are Google's)

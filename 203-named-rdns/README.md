@@ -1,4 +1,4 @@
-# DNS 202-named-rdns
+# DNS 203-named-rdns
 In this lab we'll be standing up two machines, a client from which to perform Reverse DNS requests, and a server running `named` as a nameserver. Below are the IP addresses of both machines in this lab.
 - `server - 172.27.27.27`
 - `client - 172.27.27.28`
