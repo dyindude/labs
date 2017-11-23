@@ -20,13 +20,16 @@
 - name: Install docker repo
   apt_repository:
     repo: deb [arch={{ (ansible_architecture == "x86_64") | ternary('amd64', ansible_architecture) }}] https://download.docker.com/linux/ubuntu xenial stable
-- name: Install docker-ce
+- name: update package cache
   apt:
-    name: docker-ce
     update_cache: yes
-- name: Install docker-py
+- name: Install docker packages
   apt:
-    name: python-docker
+    name: "{{ item }}"
+  with_items:
+    - docker-ce
+    - python-docker
+    - docker-compose
 - name: Add user to docker group
   user:
     name: "{{ docker_user }}"
