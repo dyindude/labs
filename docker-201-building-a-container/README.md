@@ -89,8 +89,62 @@ After the `docker` command exits, it will provide a long string of letters and n
 - Since this will be the only container running on the machine, you don't have to type out the full ID - you can get away with typing the first 3 or 4 characters and the command line utility is smart enough to complete the ID for you when referencing it internally.
 - In the next few examples, I'll be using `6a5` to indicate the container ID. When you work through this lab, be sure to use the first 3 characters of the ID shown on your screen.
 
-In case you've already lost or forgotten your ID, you can get information about running containers by running `docker ps`. The first field shown is the `CONTAINER ID`.
+In case you've already lost or forgotten your ID, you can get information about running containers by running `docker ps`.
 
+- `CONTAINER ID` - the ID of the running container
+- `IMAGE` - the docker `image` that was copied for the running container
+- `COMMAND` - the command running as the primary process of the container (we defined this in the `Dockerfile`)
+- `CREATED` - the time that has elapsed since the container (not the image) was first created
+- `STATUS` - the time that has elapsed since the container was last started (often the same timeframe as `CREATED` unless the container was stopped and then started again
+- `PORTS` - if any ports have been `EXPOSE`d in the `Dockerfile` of the `image`, they will be listed here. Since we passed the `-P` flag when we ran the container, you also see the port number on the host that has been mapped to the exposed port:
+  `0.0.0.0:32776->3000/tcp`
+- `NAMES` - any names assigned to the running container. A name can be specified at the command line when launching the container with `--name`, otherwise `docker` will generate a name for you. This name can be used in the place of the container ID when trying to run other commands.
+
+Since the port of our application has been `EXPOSE`d to the host, try running some of the commands from the lab `201-http-api` against `localhost:[port]/api`:
+
+  `$ curl -XPOST -H "Content-Type: application/json" -d '{"user": "test"}' http://localhost:32776/api`
+
+You'll see that the application behaves the same - but this time it's running in a Docker container instead of on the host machine.
+
+# docker-compose
+
+In the next exercise, we'll be packinging up our frontend and placing it in a container running `nginx`.
+
+However, instead of building a second container for `nginx` by writing a Dockerfile, we'll override some of the existing contents of the official `nginx` container image using `docker-compose`.
+
+Take a look at `docker-compose.yml`:
+
+```
+version: '2'
+services:
+  simple-http-api:
+    build: .
+    expose:
+      - "3000"
+  nginx:
+    image: nginx:latest
+    links:
+      - simple-http-api
+    volumes:
+      - "./nginx-default.conf:/etc/nginx/conf.d/default.conf"
+      - "./static/:/static"
+    ports:
+      - "80:80"
+```
+
+`docker-compose` allows one to describe more complex container environments, building relationships between different containers isntead of having to create `links` between them by hand using the command line `docker` utility.
+
+- `version` - the `version` spec that this `docker-compose.yml` conforms to #expound on this?
+- `services` - a configuration block containing all of the descriptions of the containers, ports they expose, links, and other configuration options. Each section within `services` defines a name for a service, followed by any other options associated with that service. In this case, our two `services` are `simple-http-api` and `nginx`.
+- `simple-http-api` - In this service, we define that
+  - we want to run the container from an image that is built using `docker build` in the current folder `.`
+  - this container exposes port `3000` to other running containers. #is this any container on the server, or just within the scope of this `docker-compose.yml`?
+- `nginx` - In this service, we define that
+  - we want to run the container from the public dockerhub image `nginx` with the tag `latest`
+  - this service creates a `link` to `simple-http-api`, which means that it needs access to any ports `EXPOSE`d by `simple-http-api`
+  - this service relies on a volume that maps files/folders (`nginx-default.conf` and `static/`) to locations within the filesystem of the running container
+    - mounting volumes this way will overwrite files that exist in the container image. In this case, we are effectively replacing `/etc/nginx/conf.d/default.conf` with the copy that is in our working folder with the name `nginx-default.conf` and mounting `/static` to a new folder in the container.
+  - This service exposes port `80` and maps it to port `80` on the host.
 
 # Exercise 2
 
@@ -106,5 +160,6 @@ In case you've already lost or forgotten your ID, you can get information about 
 
 - docker run
 - docker-compose
+
 
 
