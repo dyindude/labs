@@ -1,0 +1,11 @@
+---
+- hosts: all
+  tasks:
+    - name: copy simple-http-api app files
+      copy:
+        src: files/
+        dest: /home/ubuntu/simple-http-api
+        owner: ubuntu
+        group: ubuntu
+  roles:
+    - role: docker
