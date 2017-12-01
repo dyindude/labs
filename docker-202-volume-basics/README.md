@@ -101,10 +101,13 @@ Enter the `wordpress/novolumes` folder and run `docker-compose up -d`
 
 Access Wordpress at http://172.27.27.27 and perform the initial setup of wordpress. Make some changes in the interface. Make a post in the instance of Wordpress.
 
-run `docker-compose down`
-run `docker-compose up -d` again, and visit http://172.27.27.27
+Run `docker-compose down`
+
+Run `docker-compose up -d` again, and visit http://172.27.27.27
+
 What happened here?
-run `docker-compose down` to ensure these containers are destroyed.
+
+Run `docker-compose down` to ensure these containers are destroyed.
 
 # Volumes in docker-compose
 Take a look at these two `docker-compose.yml` files:
@@ -140,10 +143,13 @@ Switch to the `wordpress/volumes` folder and run `docker-compose up -d`
 Access Wordpress at http://172.27.27.27 and perform the initial setup of wordpress. Make some changes in the interface. Make a post in the instance of Wordpress.
 
 run `docker-compose down`
+
 run `docker-compose up -d` again, and visit http://172.27.27.27
+
 What happened here?
 
 Take a look at `docker volume ls` to see the list of volumes that were created.
+
 Take a look at the `Mounts` section of the output for `docker inspect` of these two containers. Look at the contents of the folders on the host *hint*: you will need to be `root` or use `sudo` to view the contents of these folders.
 
 # A note on data backup within Docker
