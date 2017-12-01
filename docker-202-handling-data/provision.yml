@@ -1,0 +1,11 @@
+---
+- hosts: all
+  tasks:
+    - name: copy wordpress files
+      copy:
+        src: files/
+        dest: /home/ubuntu/wordpress
+        owner: ubuntu
+        group: ubuntu
+  roles:
+    - role: docker
