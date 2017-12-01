@@ -1,6 +1,6 @@
-# docker 202-handling-data
+# docker 202-volume-basics
 
-In this lab we'll learn about covering the basics about different ways you can handle persistence of data with Docker containers.
+In this lab we'll learn about covering the basics about different ways you can handle persistence of data with Docker containers using `volumes`.
 
 # Setup
 - If you haven't already, follow the instructions in https://github.com/dyindude/vagrant-lab to install VirtualBox and Vagrant
@@ -9,7 +9,7 @@ In this lab we'll learn about covering the basics about different ways you can h
 - When you're done, if something in the lab messes up, or you just want to restart from scratch, type `exit` in the terminal to leave the SSH connection and run `vagrant destroy` from the project folder
 
 # About data persistence in Docker
-By default, containers only have ephemeral storage that is available to them while the container is running. When the container is stopped or destroyed, the data is destroyed along with it.
+By default, containers only have ephemeral storage that is available to them while the container is running. When the container is stopped or destroyed, changes to data within the container are destroyed along with it.
 
 A lot of applications will require some level of data persistence at one layer or another. Docker handles this with the concept of `volumes`.
 
@@ -171,49 +171,47 @@ Look for the volumes following the above naming convention:
 
 This method can be used as a simple way of inspecting data that is stored on a Docker volume.
 
+# Exercise 4
+By extending this concept, you can back up the data from a volume to a tarball on the host filesystem. Note that this exercise is an example - you can extend on this concept to store data on another server, another container, file storage service, etc.
 
-# proof of simple command to backup data on a container volume to a tarball
-docker run --rm -t -i --name mount -v pihole_pihole-data:/mnt -v $(pwd)/backup:/backup alpine:latest tar cfvj /backup/backup.tar.bz2 -C /mnt .
-# proof of simple command to restore data on a container volume from a tarball
-docker run --rm -t -i --name mount -v pihole_pihole-data:/mnt -v $(pwd)/backup:/backup alpine:latest tar xfvj /backup/backup.tar.bz2 -C /mnt
+Ensure the docker containers you created in exercise 2 are not running by executing `docker-compose down` in `wordpress/volumes`.
 
-# migration oneliner
-docker run --rm -v <SOURCE_DATA_VOLUME_NAME>:/from alpine ash -c "cd /from ; tar -cf - . " | ssh <TARGET_HOST> 'docker run --rm -i -v <TARGET_DATA_VOLUME_NAME>:/to alpine ash -c "cd /to ; tar -xpvf - " '
+Run the following command to backup the data in the `volumes_db-data` volume to an archive in `wordpress/volumes/backup`:
 
-lab steps:
+```
+$ docker run --rm -t -i -v volumes_db-data:/mnt -v $(pwd)/backup:/backup alpine tar cfvj /backup/volumes_db-data.tar.bz2 -C /mnt .
+```
 
-- run backup commands manually
-  - docker volume ls, get volume names (wordpress_db-data, wordpress_wordpress-data)
-  ```
-  for volume in wordpress_db-data wordpress_wordpress-data;do
-  docker run --rm -t -i --name mount -v $volume:/mnt -v $(pwd)/backup:/backup alpine:latest tar cfvj /backup/$volume.tar.bz2 -C /mnt .
-  done
-  ```
-- destroy volumes
-- docker-compose up #show the app doesn't work / is back to square one
-- docker-compose down
-- restore data from volume backups
-  ```
-  for volume in wordpress_db-data wordpress_wordpress-data;do
-  docker run --rm -t -i --name mount -v $volume:/mnt -v $(pwd)/backup:/backup alpine:latest sh -c "rm -rf /mnt/* && tar xfvj /backup/$v.tar.bz2 -C /mnt"
-  done
-  ```
-- docker-compose up
-- see our changes still there
-- show example using logrotate?
+Run a similar command to back up the data in the `volumes_wordpress-data` volume.
 
+Now destroy both volumes with `docker volume rm VOLUME`
 
+Run `docker-compose up -d` and check the Wordpress site. You'll see it went back to its initial state.
+Run `docker-compose down` to bring the containers down.
+
+Run the following command to restore the data in the `volumes_db-data` volume from the `backup/volumes_db-data.tar.bz2` archive:
+
+```
+$ docker run --rm -t -i -v volumes_db-data:/mnt -v $(pwd)/backup:/backup alpine sh -c 'rm -rf /mnt/* && tar xfvj /backup/volumes_db-data.tar.bz2 -C /mnt'
+```
+
+Run a similar command to restore the data in the `volumes_wordpress-data` volume from the `backup/volumes_wordpress-data.tar.bz2` archive.
+
+Run `docker-compose up -d` again, and visit http://172.27.27.27
+
+You should see the same modifications to Wordpress you made prior to backing up the data.
+If you get a vanilla setup screen for Wordpress, make sure you made changes to the application and shut down the containers with `docker-compose down` prior to making the backups.
 
 # Trivia
 - `named volumes` can be created with tools like `docker-compose`, service descriptions on Kubernetes/ECS/OpenShift and still receive a unique name
+- All of the examples in this lab use the `local` storage plugin (which is the default). There are other storage plugins, like https://github.com/ScatterHQ/flocker which enable you to use cloud storage services like Amazon EBS for volume storage backends. 
+- [This blog post](https://www.guidodiepen.nl/2016/05/transfer-docker-data-volume-to-another-host/) has an excellent example of a oneliner you could use to migrate volume data between volumes on two different Docker hosts:
+
+    ```
+    $ docker run --rm -v <SOURCE_DATA_VOLUME_NAME>:/from alpine ash -c "cd /from ; tar -cf - . " | ssh <TARGET_HOST> 'docker run --rm -i -v <TARGET_DATA_VOLUME_NAME>:/to alpine ash -c "cd /to ; tar -xpvf - " '
+    ```
+
 # Further reading
-
-- https://docs.docker.com/engine/reference/builder/
-- https://docs.docker.com/engine/reference/run/
-- simple-api-http
-
-- docker run
-- docker-compose
-
-
-
+- https://docs.docker.com/engine/admin/volumes/
+- https://docs.docker.com/engine/admin/volumes/volumes/
+- https://docs.docker.com/engine/extend/plugins_volume/
