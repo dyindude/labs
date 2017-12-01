@@ -150,17 +150,35 @@ Take a look at the `Mounts` section of the output for `docker inspect` of these 
 As indicated before, the contents of the folders of `volumes` is visible from the host filesystem. Technically speaking, you could just run a job on the host system to back up the contents of these folders to ensure the data was backed up. However, this is bad practice for the following reasons:
 
 - Running a container on the local Docker host is only one of many ways that a container can be used. Tying backup logic to the host system means that the long-term persistence of the data relies on the existence of that host, and breaks the ability to move that data to another system (another Docker host, kubernetes/ECS cluster, etc)
-- 
+- Avoiding the use of `host volumes` in general is recommended for similar reasons, since it creates a situation where migration/portability of the data and the containers using the data difficult.
+- Because of the many abstraction layers that Docker places around storage, it's more consistent to back up the data you care about from within a container. However, the container you perform the backup from doesn't necessarily have to be the same one that you are using to run the application, which will be shown in the next exercise.
 
+# Exercise 3
+Ensure the docker containers you created in exercise 2 are not running by executing `docker-compose down` in `wordpress/volumes`.
 
-- handy stuff
-# run a simple shell in an alpine container to inspect what's on a docker volume
-# docker run --rm -t -i --name mount -v simplehttpapi_pihole-data:/mnt alpine:latest /bin/sh
+By default, `docker-compose` creates volumes with the following naming convention:
+- `CURRENTFOLDERNAME_VOLUMENAME`
+
+Look for the volumes following the above naming convention:
+- The current working directory you were in when running `docker-compose up -d` is named `volumes`
+- The volumes associated with the `wordpress` and `mysql` containers are named `wordpress-data` and `db-data`, respectively
+- Use `docker volume ls` to list the current volumes on the system.
+- Use the following command (one at a time) with both volumes to open a shell in a temporary `alpine` container with the volume mounted to `/mnt`. Once in the shell, browse to `/mnt` and look through the data.
+
+  ```
+  $ docker run --rm -it -v VOLUMENAME:/mnt alpine /bin/sh
+  ```
+
+This method can be used as a simple way of inspecting data that is stored on a Docker volume.
+
 
 # proof of simple command to backup data on a container volume to a tarball
 docker run --rm -t -i --name mount -v pihole_pihole-data:/mnt -v $(pwd)/backup:/backup alpine:latest tar cfvj /backup/backup.tar.bz2 -C /mnt .
 # proof of simple command to restore data on a container volume from a tarball
 docker run --rm -t -i --name mount -v pihole_pihole-data:/mnt -v $(pwd)/backup:/backup alpine:latest tar xfvj /backup/backup.tar.bz2 -C /mnt
+
+# migration oneliner
+docker run --rm -v <SOURCE_DATA_VOLUME_NAME>:/from alpine ash -c "cd /from ; tar -cf - . " | ssh <TARGET_HOST> 'docker run --rm -i -v <TARGET_DATA_VOLUME_NAME>:/to alpine ash -c "cd /to ; tar -xpvf - " '
 
 lab steps:
 
