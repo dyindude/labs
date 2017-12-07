@@ -82,6 +82,35 @@ For example, taking another look at our permission string `rwxr--r--`:
 | Permission String | `rwxr--r--` |
 | Binary | `111100100` |
 
+Each set of permissions are represented by three single bits. Since the maximum value of a three digit binary number is `7`, it makes octal representation an easy shorthand for a full permission string. For example, the following table represents the individual permissions that are present in a subset in their simplest:
+
+| String | Binary | Octal |
+| ------ | ------ | ----- |
+| `r--`  | `100`  | `4`   |
+| `-w-`  | `010`  | `2`   |
+| `--x`  | `001`  | `1`   |
+
+This means you can find the octal representation for any permission subset by adding the corresponding octal digits. Here are a few examples:
+
+| String | Binary | Octal |
+| ------ | ------ | ----- |
+| `rw-`  | `110`  | `6 (4 + 2)` |
+| `r-x`  | `101`  | `5 (4 + 1)` |
+| `-wx`  | `011`  | `3 (1 + 2)` |
+| `rwx`  | `111`  | `7 (4 + 2 + 1)` |
+
+From there, you can represent a full permission string with a three digit octal number:
+
+| String | Binary | Octal |
+| ----------- | ----------- | ----- |
+| `rwxrwxrwx` | `111111111` | `777` |
+| `rwxr-xr-x` | `111101101` | `755` |
+| `rwxr-x---` | `111101000` | `750` |
+| `rwx------` | `111000000` | `700` |
+| `rw-r--r--` | `110100100` | `644` |
+
+
+
 
 
 
