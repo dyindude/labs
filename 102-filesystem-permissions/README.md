@@ -77,8 +77,10 @@ The permission strings we've seen thus far are human-readable representations of
 
 For example, taking another look at our permission string `rwxr--r--`:
 
+| Representation Type | Value |
+| ------------------- | ----- |
 | Permission String | `rwxr--r--` |
-| Binary Representation | `111100100` |
+| Binary | `111100100` |
 
 
 
