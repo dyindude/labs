@@ -109,6 +109,60 @@ From there, you can represent a full permission string with a three digit octal 
 | `rwx------` | `111000000` | `700` |
 | `rw-r--r--` | `110100100` | `644` |
 
+# Changing File Ownership and Permissions
+In order for permission strings to have any context, we need to understand how to assign specific user/group ownership to files. When a file is created, it inherits the same user and (default) group ownership as the user who owns the process that is creating the file.
+
+There are instances where it's desirable to change the ownership of a file, like in the case where the file was originally created by root and the permissions need to be adjusted to the context of a normal user.
+
+To assign user and group ownership of a file, use the `chown` command. The syntax is as follows:
+
+```
+$ chown [user]:[group] [filename]
+```
+
+For example, to set the ownership of the file `test.txt` to the `root` user and `root` group:
+
+```
+$ chown root:root test.txt
+```
+
+To change the effective permissions on the file, use the `chmod` command. The syntax is as follows:
+
+```
+$ chmod [octal permission code] [filename]
+```
+
+For example, to set the permission string `rwxr--r--` on `test.txt`, use the following:
+
+```
+$ chmod 744 test.txt
+```
+
+In some distributions, `chmod` also supports changing permissions in a more human-readable format:
+
+```
+$ chmod [u][g][o][a] [+|-|=] [r][w][x] [filename]
+```
+Where:
+
+- u = `user`
+- g = `group`
+- o = `other` (world)
+- a = `all` (equivalent to `ugo`)
+- + = allow permission
+- - = deny permission
+- = = changes are made as specified. Any omitted modes are denied
+- rwx = read, write, or execute permissions to be applied
+
+For example:
+
+| Command | Effect |
+| ------- | ------ |
+| `chmod u=rwx,go=r test.txt` | Equivalent to `chmod 744`, assigning permissions `rwxr--r--` |
+| `chmod ugo+r test.txt` | Adds an octal `4`, or binary `100` to each permission subset. In other words, adds `read` access to `user`, `group`, and `world`. |
+| `chmod ug=rwx,o-rwx test.txt` |  Sets `user` and `group` permissions on the file to `rwx`, and removes all permissions from `world`. |
+
+- `chmod` and `chown` both support applying changes recursively with the `-R` flag. Be careful when using `chmod -R`, as execute permissions are required on directories in order to access any content/browse to that level of the filesystem. As you can imagine, there would be devestating effects if you applied incorrect permissions recursively to the root level of the filesystem (e.g. `chmod 0644 -R /`)
 
 
 
@@ -116,3 +170,4 @@ From there, you can represent a full permission string with a three digit octal 
 
 # Trivia
 
+- consider describing the usage of `stat`
