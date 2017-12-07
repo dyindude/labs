@@ -164,10 +164,64 @@ For example:
 
 - `chmod` and `chown` both support applying changes recursively with the `-R` flag. Be careful when using `chmod -R`, as execute permissions are required on directories in order to access any content/browse to that level of the filesystem. As you can imagine, there would be devestating effects if you applied incorrect permissions recursively to the root level of the filesystem (e.g. `chmod 0644 -R /`)
 
+# Exercise 1
+Gain shell access to the machine you spun up for this lab with `vagrant ssh`.
 
+Run the following commands in order:
 
+```
+$ touch test1
+$ ls -Alh test1
+$ sudo -i
+# touch /test2
+# ls -Alh /test2
+# chown root:root /home/ubuntu/test1
+# exit
+$ touch test1
+$ sudo -i
+# chmod 666 /home/ubuntu/test1
+# exit
+$ touch test1
+$ ls -Alh test1
+$ sudo -i
+# touch /test2
+# ls -Alh /test2
+# exit
+$ touch /test2
+$ sudo -i
+# chown ubuntu:ubuntu /test2
+# chmod 600 /test2
+# ls -Alh /test2
+# touch /test2 #(what's different here?)
+# exit
+$ touch /test2 #(what changed?)
+# touch /tmp/test3
+# ls -Alh /tmp/test3
+$ touch /test2
+$ ls -Alh /test2
+$ touch /tmp/test4
+$ ls -Alh /tmp/test4
+$ ls -Alh /tmp
+$ ls -Alhd /tmp
+```
+
+- Pay attention to how the permission strings change. A normal user will need `write` access to `touch` a file.
+- Like the last lab, there's something different about `/tmp`. What is it?
 
 
 # Trivia
+- the `stat` command can be used to describe a lot useful information about a file:
 
-- consider describing the usage of `stat`
+    ```
+    $ stat /test2
+	  File: '/test2'
+	  Size: 0               Blocks: 0          IO Block: 4096   regular empty file
+	Device: 801h/2049d      Inode: 57328       Links: 1
+	Access: (0644/-rw-r--r--)  Uid: ( 1000/  ubuntu)   Gid: ( 1000/  ubuntu)
+	Access: 2017-12-07 05:13:57.528119251 +0000
+	Modify: 2017-12-07 05:13:57.528119251 +0000
+	Change: 2017-12-07 05:13:57.528119251 +0000
+	 Birth: -
+    ```
+    
+    In this output, you see the permission string, the octal representation of the permissions, as well as more detailed information about the file ownership, its last access/modify/change times, etc.
