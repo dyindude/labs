@@ -149,8 +149,8 @@ Where:
 - g = `group`
 - o = `other` (world)
 - a = `all` (equivalent to `ugo`)
-- + = allow permission
-- - = deny permission
+- \+ = allow permission
+- \- = deny permission
 - = = changes are made as specified. Any omitted modes are denied
 - rwx = read, write, or execute permissions to be applied
 
