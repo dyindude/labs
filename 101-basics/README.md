@@ -12,13 +12,14 @@
 If you've ever interacted with the command prompt on Windows, there are a few commands and behaviors that are similar.
 
 | Linux | Windows | Effect |
-| ------------------------ |
+| ----- | ------- | ------ |
 | `cd`    | `cd`      | change **c**urrent **d**irectory |
 | `ls`    | `dir`     | **l**i**s**t current **dir**ectory's contents |
 | `/`     | `\\`      | Delimiter used for distinguishing between different folder paths |
 | `.`     | `.`       | A single dot can be used to represent the current directory in a command |
 | `..`    | `..`      | Two dots can be used to represent the directory one level above the current directory |
 | `/`     | `C:\\`    | A single forward slash is used in Linux to represent the `root` directory of the filesystem. A drive letter, followed by `:\\` indicates the top level directory of a drive in Windows. |
+
 #### todo: add more here
 
 # The command prompt
@@ -29,7 +30,7 @@ After gaining shell access on the machine using `vagrant ssh`, the default promp
 The default prompt in Ubuntu provides the following information:
 
 | field | value |
-| ------------- |
+| ----- | ----- |
 | current user | `ubuntu` |
 | hostname of the machine | `shell-lab101` |
 | current working directory | `~` |
