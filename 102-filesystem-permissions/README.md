@@ -45,6 +45,42 @@ The first character in the output of `ls -l` indicates the type of file listed. 
 The last four filetypes represent more complex concepts in a Linux/UNIX system - for now, just be aware of their representations. For the purposes of this lab, we'll be working primarily with normal files, directories, and both hard/soft links.
 
 ## Permission string
+As stated previously, the permission string describes the total effective permissions on the file. These nine characters are three separate sets of characters which indicate the **r**ead, **w**rite, and e**x**ecute permissions within the scope of the file's `user`, `group`, and `world` (all other users on the system). Using the example `ls -l test.txt` output, the permission string `rwxr--r--` evaluates to:
+
+| Permission Scope | Permission string | Permissions |
+| ---------------- | ----------------- | ----------- |
+| `user`           | `rwx`             | Read, Write, Execute |
+| `group`          | `r--`             | Read |
+| `world`          | `r--`             | Read |
+
+- `r` indicates `read` access
+- `w` indicates `write` access
+- `x` indicates `execute` access
+- `-` indicates the absence of a permission
+
+Taking what we've learned thus far, the output of `ls -l test.txt` that we saw at the beginning of this lab:
+
+```
+$ ls -l test.txt
+-rwxr--r-- 1 root root 81 Jan 1 12:00 test.txt
+```
+
+provides the following information:
+
+- The file `test.txt` in the current working directory is a normal file which contains 81 bytes of data.
+- The user `root` has `read`, `write`, and `execute` permissions on this file.
+- Members of the `root` group only have permission to `read` the file.
+- All other users on the system have read-only access to the file.
+
+### Octal Permission Representation
+The permission strings we've seen thus far are human-readable representations of how the permissions are stored on the filesystem. The nine characters are stored as boolean values in a 9-digit binary number. Each set of three characters can also be represented by an octal number between 0 and 7.
+
+For example, taking another look at our permission string `rwxr--r--`:
+
+| Permission String | `rwxr--r--` |
+| Binary Representation | `111100100` |
+
+
 
 
 # Trivia
