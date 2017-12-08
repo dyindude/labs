@@ -252,6 +252,43 @@ Starting from where you left off after Exercise 1:
 - run `df -h /mnt2` to see the free space on the new logical volume
 
 # Removing block devices from logical volumes
+Just as it is possible to add new disks to existing volume group, it's also possible to remove disks using `vgreduce`. However, there are a few implications of this:
+- If a logical volume has extents that reside on the physical volume you are trying to remove, `vgreduce` will warn you and prevent you from removing the physical volume from the group. In the next exercise, we'll address this by shrinking the logical volume before removing the physical volume from the group.
+- If a filesystem exists on top of a logical volume that is to be reduced in size, you also risk data loss if the filesystem is not shrank to the resulting size before the logical volume is reduced in size. In the next exercise, we'll address this by shrinking the filesystem before shrinking the logical volume.
+
+# Exercise 3
+Starting from where you left off after Exercise 2:
+
+- There can be some minor variances in the sizes of ext4 filesystems versus logical volumes when they are created. To account for this, shrink the filesystem to a size slightly smaller than two of the disks in your three disk logical volume:
+
+    ```
+    # umount /mnt
+    # fsck -f /dev/groupname/vol0
+    fsck from util-linux 2.27.1
+    e2fsck 1.42.13 (17-May-2015)
+    Pass 1: Checking inodes, blocks, and sizes
+    Pass 2: Checking directory structure
+    Pass 3: Checking directory connectivity
+    Pass 4: Checking reference counts
+    Pass 5: Checking group summary information
+    /dev/mapper/groupname-vol0: 11/392448 files (0.0% non-contiguous), 43070/1569792 blocks
+    # resize2fs /dev/groupname/vol0 3800M
+    resize2fs 1.42.13 (17-May-2015)
+    Resizing the filesystem on /dev/groupname/vol0 to 972800 (4k) blocks.
+    The filesystem on /dev/groupname/vol0 is now 972800 (4k) blocks long.
+    ```
+
+- Now, shrink the size of your logical volume by the number of extents available on a single disk. Use `pvdisplay` to find this size. 
+
+	```
+	# lvreduce /dev/groupname/vol0 -l -511
+	  WARNING: Reducing active logical volume to 3.99 GiB
+	  THIS MAY DESTROY YOUR DATA (filesystem etc.)
+	Do you really want to reduce vol0? [y/n]: y
+	  Size of logical volume groupname/vol0 changed from 5.99 GiB (1533 extents) to 3.99 GiB (1022 extents).
+	  Logical volume vol0 successfully resized.
+	```
+
 # Migrating volumes to larger disks
 # Migrating volumes to smaller disks
 # Renaming logical volumes, working around disk cloning issues
