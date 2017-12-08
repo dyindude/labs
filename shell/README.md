@@ -1,4 +1,4 @@
-# shell-labs
+# shell
 This repository is a collection of labs to use for learning about navigating command line shells in Linux/UNIX.
 
 Please follow the instructions in https://github.com/dyindude/vagrant-lab to set up your environment before downloading this repo.

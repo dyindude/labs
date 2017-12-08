@@ -1,4 +1,4 @@
-# http-labs
+# http
 This repository is a collection of labs to use for learning about HTTP.
 
 Please follow the instructions in https://github.com/dyindude/vagrant-lab to set up your environment before downloading this repo.
