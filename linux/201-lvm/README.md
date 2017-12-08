@@ -117,7 +117,57 @@ In the output of `vgdisplay`, physical extents are abbreviated `PE`. Here's what
 - Since we have not `Alloc`ated any extents to logical volumes yet, there are `1022 PE` left to allocate, totalling `3.99GB`
 
 ## `lv` (Logical Volume)
-A `lv` is a logical representation of a slice of data from a volume group. This can be as small a
+A `lv` is a logical representation of a slice of data from a volume group. This can be as small as a single extent, or as large as the number of available extents left in a volume group. After a logical volume has been created, it can be treated as though it was any other block device.
+
+- `lvcreate` is used to create new logical volumes. In this example, we'll create a logical volume named `vol0` in volume group `groupname`, allocating it with all available extents in the volume group. This will create a logical volume that spans both of the disks in the volume group that can be treated as a single block device.
+
+    ```
+    # lvcreate -l +100%FREE -n vol0 groupname
+      Logical volume "vol0" created.
+    ```
+
+    Checking the output of `vgdisplay groupname` again, you'll see that the values in the `Alloc PE` and `Free PE` fields have changed:
+
+    ```
+    # vgdisplay groupname
+    ...
+      Alloc PE / Size       1022 / 3.99 GiB
+      Free  PE / Size       0 / 0
+      VG UUID               Lp4PEs-lX2v-fl2s-dkzs-o05g-kFFD-wnnnyT
+    ```
+
+- `lvs` is used to report general information about all of the logical volumes the `lvm` daemon on the system is aware of.
+
+	```
+	# lvs
+	  LV   VG        Attr       LSize Pool Origin Data%  Meta%  Move Log Cpy%Sync Convert
+	  vol1 group2    -wi-a----- 3.99g
+	  vol0 groupname -wi-a----- 3.99g
+	```
+
+- `lvdisplay` will provide more specific information about an individual logical volume:
+
+	```
+	# lvdisplay /dev/groupname/vol0 
+	  --- Logical volume ---
+	  LV Path                /dev/groupname/vol0
+	  LV Name                vol0
+	  VG Name                groupname
+	  LV UUID                WEWnlP-QPVu-3GPY-kIld-cJQb-xmEh-UBJV4h
+	  LV Write Access        read/write
+	  LV Creation host, time shell-lab101, 2017-12-08 03:21:13 +0000
+	  LV Status              available
+	  # open                 0
+	  LV Size                3.99 GiB
+	  Current LE             1022
+	  Segments               2
+	  Allocation             inherit
+	  Read ahead sectors     auto
+	  - currently set to     256
+	  Block device           252:0
+	```
+
+    You'll notice that the `Current LE` (logical extents) field shows the same number of extents that we assigned to the logical volume when it was created.
 
 # Trivia
 
