@@ -1,0 +1,37 @@
+---
+- name: Install linux-image-extra
+  apt:
+    name: "{{ item }}"
+  with_items:
+    - linux-image-extra-{{ ansible_kernel }}
+    - linux-image-extra-virtual
+- name: Install prereqs for docker repo
+  apt:
+    name: "{{ item }}"
+  with_items:
+    - apt-transport-https
+    - ca-certificates
+    - curl
+    - software-properties-common
+- name: Install docker apt-key
+  apt_key:
+    url: https://download.docker.com/linux/ubuntu/gpg
+    id: 9DC858229FC7DD38854AE2D88D81803C0EBFCD88
+- name: Install docker repo
+  apt_repository:
+    repo: deb [arch={{ (ansible_architecture == "x86_64") | ternary('amd64', ansible_architecture) }}] https://download.docker.com/linux/ubuntu xenial stable
+- name: update package cache
+  apt:
+    update_cache: yes
+- name: Install docker packages
+  apt:
+    name: "{{ item }}"
+  with_items:
+    - docker-ce
+    - python-docker
+    - docker-compose
+- name: Add user to docker group
+  user:
+    name: "{{ docker_user }}"
+    groups: docker
+    append: yes
