@@ -1,0 +1,8 @@
+zone "lab202.dyindude" {
+    type master;
+    file "/etc/bind/zones/db.lab202.dyindude"; # zone file path
+};
+zone "27.27.172.in-addr.arpa" {
+    type master;
+    file "/etc/bind/zones/db.27.27.172.in-addr.arpa"; # zone file path for our reverse DNS entries
+};

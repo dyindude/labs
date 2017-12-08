@@ -1,0 +1,22 @@
+---
+- hosts: all
+  tasks:
+    - name: install server packages
+      apt:
+        name: "{{ item }}"
+        state: present
+      with_items:
+        - dnsmasq
+    - name: install conf file for dnsmasq
+      copy:
+        src: bogus-nxdomains
+        dest: /etc/dnsmasq.d/bogus-nxdomains
+        owner: root
+        group: root
+        mode: 0644
+      notify: restart dnsmasq
+  handlers:
+    - name: restart dnsmasq
+      service:
+        name: dnsmasq
+        state: restarted

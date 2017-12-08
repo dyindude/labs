@@ -1,0 +1,4 @@
+zone "lab202.dyindude" {
+    type master;
+    file "/etc/bind/zones/db.lab202.dyindude"; # zone file path
+};
