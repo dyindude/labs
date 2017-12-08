@@ -1,19 +1,7 @@
 # linux 201-lvm
-By the end of this lab, you should have an understanding of the following:
+`lvm` is a suite of utilities and a system daemon used to abstract physical block devices and create logical block devices from slices of data (known as extents) on each physical block device. The logical block devices managed by `lvm` can be used by other system utilities in the same way as any other block device.
 
-- `lvm` structure
-  - `pv` (Physical Volumes)
-  - `vg` (Volume Groups)
-  - `lv` (Logical Volumes)
-- Advantages of LVM vs more traditional disk partitioning methods
-- Common tasks utilizing LVM
-  - Adding a disk
-  - Extending existing disk space
-  - Identifying physical disk LVM counterparts (I know how to do this in VMware, but maybe not vbox..we'll see)
-- Uncommon tasks utilizing LVM
-  - Shrinking a root volume size
-  - LVM snapshots
-  - Renaming a logical volume
+By the end of this lab, you should have an understanding of how disk management works when using `lvm`. The `Vagrantfile` provided with this lab stands up a single Ubuntu system with four blank 2GB disks.
 
 # Setup
 - If you haven't already, follow the instructions in https://github.com/dyindude/vagrant-lab to install VirtualBox and Vagrant
@@ -169,6 +157,33 @@ A `lv` is a logical representation of a slice of data from a volume group. This 
 
     You'll notice that the `Current LE` (logical extents) field shows the same number of extents that we assigned to the logical volume when it was created.
 
+# Exercise 1
+Now that you've seen how all these commands can be used together, gain shell access on the machine provided with this lab by running `vagrant ssh`.
+
+- Become `root` by running `sudo -i`
+- Run `fdisk -l` to see the available drives on the system.
+  - The following drives are blank 2GB disks you can use with this exercise:
+    `/dev/sdc`
+    `/dev/sdd`
+    `/dev/sde`
+    `/dev/sdf`
+  - Avoid using `/dev/sda` or `/dev/sdb` (as they are provided by the Vagrant box used for this lab)
+
+- Select two of the disks, and create physical volumes with them using `pvcreate`
+- Run `pvs` to see the information about your new PVs, and the amount of data available with them.
+- Run `pvdisplay` on both volumes.
+- Add these two disks to a volume group with `vgcreate`. Choose your own name.
+- Run `vgs`
+- Run `vgdisplay` on your volume group's name
+- Create a logical volume spanning the entire free space available in your volume group. Again, choose your own name for this, and remember to use the volume group name that you defined earlier.
+
+
+
+#### I know there are some more interesting exercises we can do here.
+
 # Trivia
+
+# Further reading
+- Read the `man` pages associated with each command. Find different parameters to try with each command in the exercises.
 
 
