@@ -1,5 +1,9 @@
-# vagrant-lab
-This repository is to be used as a guide for helping you install a few tools to aid in learning a variety of Linux/IT skills. I will be using a machine configured like this as the basis for the labs I create for learning material.
+# dyindude/labs
+This repository is to be used as a guide for learning about different foundational IT concepts.
+
+The files in the root directory provide instructions on how to get up and going with Vagrant and Virtualbox, the only two pieces of software you will need to run any of the labs on your local system.
+
+The subfolders are split up into different topics with labs aimed at a variety of skill levels. Regardless of your current knowledge, I welcome any and all feedback.
 
 #How the labs work
 - [Virtualbox](https://www.virtualbox.org/) is a software for running virtual machines on your system.
