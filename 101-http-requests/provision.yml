@@ -1,0 +1,21 @@
+---
+- hosts: all
+  tasks:
+    - name: install packages for this lab
+      apt:
+        name: "{{ item }}"
+        state: present
+      with_items:
+        - nginx
+    - name: remove default nginx index
+      file:
+        name: /var/www/html/index.nginx-debian.html
+        state: absent
+    - name: add our web files
+      copy:
+        src: index.html
+        dest: /var/www/html/index.html
+        owner: root
+        group: root
+        mode: 0644
+
