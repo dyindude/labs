@@ -1,0 +1,16 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+Vagrant.configure("2") do |config|
+  config.vm.box = "ubuntu/xenial64"
+  config.vm.hostname = "shell-lab101"
+
+  (2..5).each do |i|
+      config.vm.provider "virtualbox" do | v |
+          unless File.exist?("./disk#{i}.vdi")
+              v.customize ['createhd', '--filename', "./disk#{i}.vdi", '--size', 2 * 1024]
+          end
+          v.customize ['storageattach', :id, '--storagectl', 'SCSI', '--port', i, '--device', 0, '--type', 'hdd', '--medium', "./disk#{i}.vdi"]
+      end
+  end
+end
