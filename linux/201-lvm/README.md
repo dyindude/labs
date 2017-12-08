@@ -3,6 +3,8 @@
 
 By the end of this lab, you should have an understanding of how disk management works when using `lvm`. The `Vagrantfile` provided with this lab stands up a single Ubuntu system with four blank 2GB disks.
 
+This lab assumes you have some familiarity with working with block devices in Linux software distributions, particularly creating filesystems, mounting them, etc.
+
 # Setup
 - If you haven't already, follow the instructions in https://github.com/dyindude/vagrant-lab to install VirtualBox and Vagrant
 - Download a copy of this repo, navigate to its folder and run `vagrant up`, followed by `vagrant ssh`
@@ -133,7 +135,7 @@ A `lv` is a logical representation of a slice of data from a volume group. This 
 	  vol0 groupname -wi-a----- 3.99g
 	```
 
-- `lvdisplay` will provide more specific information about an individual logical volume:
+- `lvdisplay` will provide more specific information about an individual logical volume. The path you can access the logical block device for the volume is under `/dev/[VG]/[PV]`:
 
 	```
 	# lvdisplay /dev/groupname/vol0 
@@ -176,10 +178,79 @@ Now that you've seen how all these commands can be used together, gain shell acc
 - Run `vgs`
 - Run `vgdisplay` on your volume group's name
 - Create a logical volume spanning the entire free space available in your volume group. Again, choose your own name for this, and remember to use the volume group name that you defined earlier.
+- Create an ext4 filesystem on the logical volume and mount it to `/mnt`
+- run `df -h /mnt` to see the available free space on the new filesystem.
 
+# Making changes to logical volumes
+One of the advantages of using `lvm` for managing block devices is that it allows you to change the structure of the underlying block device and filesystem, often without having to unmount the volume or restart the system (as is the case when working with physical block devices).
 
+- `vgextend` can be used to add more physical volumes to an existing volume group:
 
-#### I know there are some more interesting exercises we can do here.
+	```
+	# vgextend groupname /dev/sdd
+	  Volume group "groupname" successfully extended
+	```
+    
+    After making this change, the output of `vgs` and `vgdisplay` will show there are now more extents available in the volume group:
+
+	```
+	# vgs
+	  VG        #PV #LV #SN Attr   VSize VFree
+	  groupname   3   1   0 wz--n- 5.99g 2.00g
+	# vgdisplay groupname
+	  --- Volume group ---
+	  VG Name               groupname
+	  System ID             
+	  Format                lvm2
+	  Metadata Areas        3
+	  Metadata Sequence No  3
+	  VG Access             read/write
+	  VG Status             resizable
+	  MAX LV                0
+	  Cur LV                1
+	  Open LV               1
+	  Max PV                0
+	  Cur PV                3
+	  Act PV                3
+	  VG Size               5.99 GiB
+	  PE Size               4.00 MiB
+	  Total PE              1533
+	  Alloc PE / Size       1022 / 3.99 GiB
+	  Free  PE / Size       511 / 2.00 GiB
+	  VG UUID               wqNgUq-n9Qo-jh0F-bqth-GQpK-68gF-IQiqUK
+	```
+    
+    With these extra extents, existing logical volumes can be extended further onto them with `lvextend`, or new logical volumes can be created within the extents using `lvcreate`.
+
+	```
+	# lvextend -l+100%FREE /dev/groupname/vol0 
+	  Size of logical volume groupname/vol0 changed from 3.99 GiB (1022 extents) to 5.99 GiB (1533 extents).
+	  Logical volume vol0 successfully resized.
+	```
+
+	Note that this only resizes the logical block device, and not the filesystem that has been created on top of it. After growing the size of a logical volume, in order to utilize that data on a system, you would still need to grow the filesystem as well:
+
+	```
+	# resize2fs /dev/groupname/vol0 
+	resize2fs 1.42.13 (17-May-2015)
+	Filesystem at /dev/groupname/vol0 is mounted on /mnt; on-line resizing required
+	old_desc_blocks = 1, new_desc_blocks = 1
+	The filesystem on /dev/groupname/vol0 is now 1569792 (4k) blocks long.
+	```
+
+# Exercise 2
+Starting from where you left off after Exercise 1:
+
+- Use `pvs` to determine which disks you've already turned into physical volumes.
+- Use `pvcreate` to create another physical volume
+- Use `vgextend` to add this physical volume to your volume group
+- Use `lvextend` to extend the size of the logical volume to include the new extents added by the new disk
+- Resize the filesystem of your logical volume
+- Use `pvcreate` to create a physical volume with the remaining disk.
+- Use `lvcreate` to create another logical volume within your volume group
+
+##### removing disks/shrinking filesystems etc
+
 
 # Trivia
 
