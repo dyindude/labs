@@ -181,7 +181,7 @@ Now that you've seen how all these commands can be used together, gain shell acc
 - Create an ext4 filesystem on the logical volume and mount it to `/mnt`
 - run `df -h /mnt` to see the available free space on the new filesystem.
 
-# Making changes to logical volumes
+# Adding block devices to logical volumes
 One of the advantages of using `lvm` for managing block devices is that it allows you to change the structure of the underlying block device and filesystem, often without having to unmount the volume or restart the system (as is the case when working with physical block devices).
 
 - `vgextend` can be used to add more physical volumes to an existing volume group:
@@ -248,8 +248,13 @@ Starting from where you left off after Exercise 1:
 - Resize the filesystem of your logical volume
 - Use `pvcreate` to create a physical volume with the remaining disk.
 - Use `lvcreate` to create another logical volume within your volume group
+- Create a filesystem on the new logical volume, create the folder /mnt2 and mount the new volume to that location.
+- run `df -h /mnt2` to see the free space on the new logical volume
 
-##### removing disks/shrinking filesystems etc
+# Removing block devices from logical volumes
+# Migrating volumes to larger disks
+# Migrating volumes to smaller disks
+# Renaming logical volumes, working around disk cloning issues
 
 
 # Trivia
