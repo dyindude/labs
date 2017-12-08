@@ -5,7 +5,7 @@ The files in the root directory provide instructions on how to get up and going 
 
 The subfolders are split up into different topics with labs aimed at a variety of skill levels. Regardless of your current knowledge, I welcome any and all feedback.
 
-#How the labs work
+# How the labs work
 - [Virtualbox](https://www.virtualbox.org/) is a software for running virtual machines on your system.
 - [Vagrant](https://www.vagrantup.com/) is a software for describing development environments built on virtual machines with text files called Vagrantfiles. With a Vagrantfile, you can build the environment outlined within VirtualBox by simply running `vagrant up` from the command line.
   - While Vagrant supports other virtualization providers, VirtualBox and Vagrant work well together without any additional configuration. This is why I have chosen them as the basis for my labs.
