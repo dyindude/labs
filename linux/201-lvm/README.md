@@ -440,6 +440,48 @@ The general process for migrating a logical volume to a smaller physical volume 
 - use `lvresize` to grow the logical volume to any remainder extents (if you do your math right, this is only a handful)
 - resize the filesystem that resides on top of the logical volume
 
+# Exercise 5
+At the end of Exercise 4, your volume group should be about 4GB in size:
+
+```
+/dev/mapper/group0-vol0  3.9G  8.0M  3.7G   1% /mnt
+```
+
+However, the filesystem is only using 8.0M. In this exercise, we are going to drastically reduce the size of this filesystem and its logical volume to around 100M.
+
+Start by creating a 100M file to use as a block device, and set it up as a loopback device:
+
+```
+# dd if=/dev/zero of=/physical-volume.raw bs=1M count=100
+100+0 records in
+100+0 records out
+104857600 bytes (105 MB, 100 MiB) copied, 0.0841903 s, 1.2 GB/s
+# ls -Alh /physical-volume.raw 
+-rw-r--r-- 1 root root 100M Dec 12 02:45 /physical-volume.raw
+# losetup /dev/loop0 /physical-volume.raw
+```
+
+Add the loopback device `/dev/loop0` as a physical volume:
+
+```
+# pvcreate /dev/loop0
+  Physical volume "/dev/loop0" successfully created
+```
+
+Now step through this process. Remember, our extent size is `4M`, and we want to avoid colliding boundaries between physical block device size, logical volume size, and filesystem size
+
+- Add `/dev/loop0` to your volume group with `vgextend`
+- shrink the filesystem on your logical volume to `90M`
+- shrink the logical volume to `96M`
+- check physical volume mappings with `pvdisplay -m`
+- use `pvmove` to migrate the extents associated with your logical volume to the smaller disk
+- check physical volume mappings with `pvdisplay -m`
+- use `vgreduce` to remove both of the larger disk from the volume group
+- use `pvremove` to remove both of the larger disks from `lvm`
+- grow the logical volume to allocate any remaining extents
+- grow the filesystem to allocate any remaining space in the logical volume
+- check the output of `df -h /mnt`
+
 # Renaming logical volumes, working around disk cloning issues
 
 
