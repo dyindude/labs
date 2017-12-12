@@ -338,9 +338,108 @@ Starting from where you left off after Exercise 2:
 	  Removed "/dev/sde" from volume group "group0"
 	```
 
-# Migrating volumes to larger disks
+# Moving logical volumes to different Physical Volumes
+In the last exercise, it's important to grasp that while `Volume Groups` are logical groupings of `Physical Volumes`, the data associated with a `Logical Volume` is mapped to Physical Extents on `Physical Volumes` within the group.
+
+Take a look at the output of `pvdisplay -m`
+
+```
+# pvdisplay -m
+  --- Physical volume ---
+  PV Name               /dev/sdc
+  VG Name               group0
+  PV Size               2.00 GiB / not usable 4.00 MiB
+  Allocatable           yes (but full)
+  PE Size               4.00 MiB
+  Total PE              511
+  Free PE               0
+  Allocated PE          511
+  PV UUID               qissAX-4NwD-4MT2-6gX5-NLK2-Hn8W-obQhta
+   
+  --- Physical Segments ---
+  Physical extent 0 to 510:
+    Logical volume      /dev/group0/vol0
+    Logical extents     0 to 510
+   
+  --- Physical volume ---
+  PV Name               /dev/sdd
+  VG Name               group0
+  PV Size               2.00 GiB / not usable 4.00 MiB
+  Allocatable           yes (but full)
+  PE Size               4.00 MiB
+  Total PE              511
+  Free PE               0
+  Allocated PE          511
+  PV UUID               C7SPne-fqko-dxur-OhT0-7Kq6-Fxc5-CimMW9
+   
+  --- Physical Segments ---
+  Physical extent 0 to 510:
+    Logical volume      /dev/group0/vol0
+    Logical extents     511 to 1021
+   
+  --- Physical volume ---
+  PV Name               /dev/sdf
+  VG Name               group0
+  PV Size               2.00 GiB / not usable 4.00 MiB
+  Allocatable           yes (but full)
+  PE Size               4.00 MiB
+  Total PE              511
+  Free PE               0
+  Allocated PE          511
+  PV UUID               qOlNnq-dEFE-q2ov-ID6m-NDH8-9DPi-8jMn9j
+   
+  --- Physical Segments ---
+  Physical extent 0 to 510:
+    Logical volume      /dev/group0/vol1
+    Logical extents     0 to 510
+   
+  "/dev/sde" is a new physical volume of "2.00 GiB"
+  --- NEW Physical volume ---
+  PV Name               /dev/sde
+  VG Name               
+  PV Size               2.00 GiB
+  Allocatable           NO
+  PE Size               0   
+  Total PE              0
+  Free PE               0
+  Allocated PE          0
+  PV UUID               XvIfXy-tarY-dxwz-l1SS-ZgeU-Moj5-2OBu2i
+
+```
+
+In the sections of the output labeled `Physical Segments`, you can see which numbered extents are associated with which logical volumes in the current configuration.
+
+In this case:
+- extent 0 through 510 (a total of 511 extents) on `/dev/sdc` are mapped to `/dev/group0/vol0`
+- extent 0 through 510 on `/dev/sdd` are mapped to `/dev/group0/vol0`
+- extent 0 through 510 on `/dev/sdf` are mapped to `/dev/group0/vol1`
+- `/dev/sde` has no `Free PE`, `Total PE`, etc, because it is not currently a member of a volume group. It is marked as a `new` physical volume.
+
+The `pvmove` command can be used to move all of the extents (and thus, the data) that reside on one physical volume to another physical volume within the same volume group. The target physical volume must have enough `Free PE` to contain the extents being migrated.
+
+In the next exercise, we'll go through the process of migrating all of the extents associated with `/dev/group0/vol0` on `/dev/sdd` and placing them on `/dev/sde`. This can be performed while the filesystem is mounted!
+
+# Exercise 4
+- Add `/dev/sde` back to your volume group with `vgextend`
+- Run `pvdisplay -m`, compare `/dev/sdd` to `/dev/sde` with respect to `Free PE`, `Total PE`
+- run `pvmove /dev/sdd /dev/sde`
+- While you wait, open another terminal session and see if you're still able to interact with the filesystem at `/mnt`
+- Run `pvdisplay -m`, compare `/dev/sdd` to `/dev/sde` with respect to `Free PE`, `Total PE`
+- Use `vgreduce` to remove `/dev/sdd`, which now has no PE associated with your volume group, from your volume group.
 
 # Migrating volumes to smaller disks
+Using all of the tools we've learned about in this lab, it's possible to migrate data from larger disks to smaller disks. The only requirement for all extents to evacuate a physical volume with `pvmove` is that the target physical volume has the same or more extents than the number of extents actually in use on the physical volume. If a logical volume is shrank, it will use fewer physical extents on the PVs it is mapped to #wording
+
+The general process for migrating a logical volume to a smaller physical volume is this:
+
+- shrink the filesystem (ideally a size smaller than your target size)
+- shrink the logical volume to your target volume size (or just slightly smaller than the physical volume you are wanting to migrate to, but still larger than the filesystem)
+- add a new physical volume to the volume group that is your target size or larger in extents
+- use `pvmove` to move the extents from the larger physical volume to the smaller physical volume.
+- verify no extents are mapped to the larger disk, remove it from the volume group with `vgreduce`. use `pvremove` to remove it from being tracked by `lvm` entirely if you plan on physically removing the underlying block device.
+- use `lvresize` to grow the logical volume to any remainder extents (if you do your math right, this is only a handful)
+- resize the filesystem that resides on top of the logical volume
+
 # Renaming logical volumes, working around disk cloning issues
 
 
