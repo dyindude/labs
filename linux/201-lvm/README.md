@@ -497,8 +497,6 @@ When working in virtualized environments, it's sometimes necessary to restore a 
 
 In this case, I've created a duplicate of the loopback file we set up in Exercise 5 at `/dev/loop0`. When `lvm` detects this condition, it will bring up one of the physical volumes and deactivate the other.
 
-##### add creating 'old data' file to old /dev/loop0 lvm
-
 To demonstrate this, if the logical volume is mounted, the file we created at the end of Exercise 5 is no longer present:
 
 ```
