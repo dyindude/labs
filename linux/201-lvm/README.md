@@ -247,6 +247,7 @@ Starting from where you left off after Exercise 1:
 - Use `lvextend` to extend the size of the logical volume to include the new extents added by the new disk
 - Resize the filesystem of your logical volume
 - Use `pvcreate` to create a physical volume with the remaining disk.
+- Add the remaining disk to the volume group
 - Use `lvcreate` to create another logical volume within your volume group
 - Create a filesystem on the new logical volume, create the folder /mnt2 and mount the new volume to that location.
 - run `df -h /mnt2` to see the free space on the new logical volume
@@ -289,7 +290,56 @@ Starting from where you left off after Exercise 2:
 	  Logical volume vol0 successfully resized.
 	```
 
+- Remount your logical volume to `/mnt`, and check the free space:
+    
+    ```
+	# df -h /mnt
+	Filesystem               Size  Used Avail Use% Mounted on
+	/dev/mapper/group0-vol0  3.6G  8.0M  3.4G   1% /mnt
+	```
+
+    Data loss has been avoided, as the filesystem has been shrank to a size smaller than the new logical volume size (prior to shrinking the logical volume).
+
+- Resize the filesystem again to the full size of the logical volume:
+
+	```
+	# resize2fs /dev/group0/vol0 
+	resize2fs 1.42.13 (17-May-2015)
+	Filesystem at /dev/group0/vol0 is mounted on /mnt; on-line resizing required
+	old_desc_blocks = 1, new_desc_blocks = 1
+	The filesystem on /dev/group0/vol0 is now 1046528 (4k) blocks long.
+
+	# df -h /mnt
+	Filesystem               Size  Used Avail Use% Mounted on
+	/dev/mapper/group0-vol0  3.9G  8.0M  3.7G   1% /mnt
+	```
+
+- Use `pvdisplay` to find the physical volume that now has only Free extents:
+
+    ```
+	  --- Physical volume ---
+	  PV Name               /dev/sde
+	  VG Name               group0
+	  PV Size               2.00 GiB / not usable 4.00 MiB
+	  Allocatable           yes 
+	  PE Size               4.00 MiB
+	  Total PE              511
+	  Free PE               511
+	  Allocated PE          0
+	  PV UUID               XvIfXy-tarY-dxwz-l1SS-ZgeU-Moj5-2OBu2i
+    ```
+
+    This disk is safe to remove from the volume group because this volume's `Free PE` matches its `Total PE`. There is no data associated with any logical volume on that physical volume.
+
+- Use `vgreduce` to remove the target drive from the volume group:
+
+    ```
+	# vgreduce group0 /dev/sde
+	  Removed "/dev/sde" from volume group "group0"
+	```
+
 # Migrating volumes to larger disks
+
 # Migrating volumes to smaller disks
 # Renaming logical volumes, working around disk cloning issues
 
