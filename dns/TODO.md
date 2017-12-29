@@ -1,0 +1,1 @@
+- need intro-level abstract material (what is dns, why is it important, etc) to be read/prep student for 101 level labs
