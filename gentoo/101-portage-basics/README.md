@@ -327,13 +327,88 @@ Step through the configuration changes made in the examples since the first exer
 - Run `emerge --update --deep --newuse --ask --verbose @world` and update any packages that need updates
 - Enable the `lua` flag on `app-editors/vim` in /etc/portage/package.use/vim
 - Disable the `acl` flag globally in `/etc/portage/make.conf`
+- Run `which lua`, note that `lua` is not currently in path
+- Run `equery l lua`, note that no package atom is currently installed matching the name `lua`
 - Run `emerge -uDNav @world` (remember this is the shorthand of the command ran previously) to apply both the package and global scope `USE` flag changes.
+- Run `which lua`, note where the lua binary has been installed
+- Run `equery l lua`, note that the package was now installed as a dependency of our `USE` flag change for `app-editors/vim`
+
+# Dependency cleanup
+After disabling a `USE` flag globally and recompiling affected packages, the system will inevitably be in a state where there are now installed packages that no other compiled packages rely on. `portage` provides the `--depclean` flag to help address this.
+
+The output of the last `emerge` command in the previous exercise alludes to this issue:
+
+```
+ * After world updates, it is important to remove obsolete packages with
+ * emerge --depclean. Refer to `man emerge` for more information.
+```
+
+By running `emerge --pretend --verbose --depclean`, we can ask portage to provide us with a report on what packages would be removed by `--depclean`. The verbose output will include information about the entire dependency tree of packages on the system, followed by a shorter list of the affected packages:
+
+```
+>>> These are the packages that would be unmerged:
+
+ virtual/acl
+    selected: 0-r2 
+   protected: none 
+     omitted: none 
+
+
+!!! 'app-editors/nano' (virtual/editor) is part of your system profile.
+!!! Unmerging it may be damaging to your system.
+
+
+ app-editors/nano
+    selected: 2.7.5 
+   protected: none 
+     omitted: none 
+
+ dev-python/appdirs
+    selected: 1.4.3 
+   protected: none 
+     omitted: none 
+
+ sys-apps/acl
+    selected: 2.2.52-r1 
+   protected: none 
+     omitted: none 
+
+All selected packages: =app-editors/nano-2.7.5 =sys-apps/acl-2.2.52-r1 =virtual/acl-0-r2 =dev-python/appdirs-1.4.3
+
+>>> 'Selected' packages are slated for removal.
+>>> 'Protected' and 'omitted' packages will not be removed.
+
+Packages installed:   266
+Packages in world:    9
+Packages in system:   43
+Required packages:    262
+Number to remove:     4
+```
+
+While it is true that `app-editors/nano` is part of our system profile `default/linux/amd64/13.0`, we know that this package is safe to unmerge because we have already added another editor to the system with `app-editors/vim`.
+
+It's important to run a test run with `--depclean`, because misconfigurations can lead to cases where depclean will remove more than what the user intended.
+
+In this case, we know that all of the listed packages are safe to remove, so we can follow through with `emerge -v --depclean` to actually uninstall these packages.
+
+# Exercise 3
+Ensure you are in a shell on the machine provided for this lab with `vagrant ssh`.
+
+Step through the configuration changes made in the last example:
+
+- Run `emerge -pv --depclean` and check to make sure no extraneous packages are being removed (the list should be similar to the one shown in the example
+- Run `emerge -v --depclean` and watch the output that portage provides (including the countdown timer) when cleaning dependencies.
+- If you like, try hitting `ctrl+c` during the countdown timer to see that you have time to cancel this change before packages are removed.
+
+# stable, testing keywords?
 
 # Trivia
 - `emerge-webrsync` is the modern, recommended method used for updating the `portage` tree, since it will download incremental diffs of the portage tree based on timestamped snapshots compared against the timestamp of the last time the portage tree was synced on this system.
 - In comparison, `emerge --sync` still works, but it will recursively sync the entire portage tree with every invocation of the command.
 - the `@selected` set, which contains the packages explicitly installed by users on the system (as opposed to packages defined in the `profile`), is stored in the oddly named `/var/lib/portage/world`
 - package sets such as `@selected` can also be referenced when invoking `equery` for gathering information about packages
+- since `/etc/portage/package.use` will source files from subdirectories, it may make sense to create `category` subfolders for package scope `USE` flags so that it's easier to identify the package associated with the file (for example, using `/etc/portage/package.use/app-editors/vim` instead of `/etc/portage/package.use/vim`.
+- In other cases, you may want to define different `USE` flags for multiple packages using a more descriptive filename. An example might be a file that contains package specific `USE` flags for different packages that are a part of your desktop environment named `desktop`, `awesome`, `gnome`, or similar. In the end, whatever makes the most sense to you is what is important.
 
 # Further reading
 - https://wiki.gentoo.org/wiki/Gentoo_Cheat_Sheet#Package_installation_and_removal
