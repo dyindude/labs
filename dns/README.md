@@ -1,7 +1,7 @@
 # dns
 This folder is a collection of labs to use for learning DNS.
 
-Please follow the instructions in https://github.com/dyindude/vagrant-lab to set up your environment before downloading this repo.
+Please follow the instructions in the root labs folder to set up your environment before trying to work through one of these labs.
 
 Each subfolder in this repo is a different lab. Simply navigate to one of the subfolders, open `README.md` in that folder (or just open it from github in your browser), and run `vagrant up`.
 

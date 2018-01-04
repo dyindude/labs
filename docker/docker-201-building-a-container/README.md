@@ -3,10 +3,6 @@ This lab will walk you through taking an existing webapp and writing a Dockerfil
 We'll start by examining a `Dockerfile` and `docker-compose.yml` built for the app used in the `201-http-api` lab.
 
 # Setup
-- If you haven't already, follow the instructions in https://github.com/dyindude/vagrant-lab to install VirtualBox and Vagrant
-- Download a copy of this repo, navigate to its folder and run `vagrant up`, followed by `vagrant ssh`
-- You'll now be in a shell of a virtual machine configured for this lab.
-- When you're done, if something in the lab messes up, or you just want to restart from scratch, type `exit` in the terminal to leave the SSH connection and run `vagrant destroy` from the project folder
 
 Log into the system for this lab with `vagrant ssh`, and take a look at the files in the `simple-http-api` folder:
 

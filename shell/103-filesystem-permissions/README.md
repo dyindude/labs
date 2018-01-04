@@ -3,13 +3,6 @@ File access permissions in Linux are designed to provide server administrators w
 
 The concepts covered in this lab are the most basic level of permissions used in Linux/UNIX filesystems - some operating systems provide other utilities to provide more contextual control over who/what process can access/use files.
 
-# Setup
-- If you haven't already, follow the instructions in https://github.com/dyindude/vagrant-lab to install VirtualBox and Vagrant
-- Download a copy of this repo, navigate to its folder and run `vagrant up`, followed by `vagrant ssh`
-- You'll now be in a shell of a virtual machine configured for this lab.
-- Many of the examples in this lab will require root access, so please run `sudo -i` after you gain shell access to the VM
-- When you're done, if something in the lab messes up, or you just want to restart from scratch, type `exit` in the terminal to leave the SSH connection and run `vagrant destroy` from the project folder 
-
 # Permission Structure
 Before getting into the specifics of how permissions can be changed/managed on files, let's take a look at the output of `ls -l text.txt` and analyze each field presented:
 

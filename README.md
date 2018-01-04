@@ -30,9 +30,9 @@ After all of the above software has been installed, open a terminal of your choi
 
 Clone this repo with git by running:
 
-`git clone https://github.com/dyindude/vagrant-lab.git`
+`git clone https://github.com/dyindude/labs.git`
 
-`cd` into the `vagrant-lab` folder and run the command `vagrant up`. Vagrant will download the `ubuntu/xenial64` and start a virtual machine in the background.
+`cd` into the `labs` folder and run the command `vagrant up`. Vagrant will download the `ubuntu/xenial64` and start a virtual machine in the background.
 
 Once the VM has been started and you return to your shell's prompt, try logging into the VM with `vagrant ssh`
 
@@ -43,7 +43,7 @@ Bringing machine 'default' up with 'virtualbox' provider...
 ==> default: Importing base box 'ubuntu/xenial64'...
 ==> default: Matching MAC address for NAT networking...
 ==> default: Checking if box 'ubuntu/xenial64' is up to date...
-==> default: Setting the name of the VM: vagrant-lab_default_1510623605345_58237
+==> default: Setting the name of the VM: labs_default_1510623605345_58237
 ==> default: Clearing any previously set network interfaces...
 ==> default: Preparing network interfaces based on configuration...
     default: Adapter 1: nat
@@ -51,7 +51,7 @@ Bringing machine 'default' up with 'virtualbox' provider...
     default: Guest Additions Version: 5.0.40
     default: VirtualBox Version: 5.2
 ==> default: Mounting shared folders...
-    default: /vagrant => /home/dyindude/projects/vagrant-lab
+    default: /vagrant => /home/dyindude/projects/labs
 $ vagrant ssh
 Welcome to Ubuntu 16.04.3 LTS (GNU/Linux 4.4.0-98-generic x86_64)
 

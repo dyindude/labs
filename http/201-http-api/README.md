@@ -2,12 +2,6 @@
 
 In this lab, we'll be performing requests against a simple API endpoint that has been configured to return the same JSON payload that is `POST` to it. We'll do requests from the command line on the server, and try it out from the browser as well.
 
-# Setup
-- If you haven't already, follow the instructions in https://github.com/dyindude/vagrant-lab to install VirtualBox and Vagrant
-- Download a copy of this repo, navigate to its folder and run `vagrant up`, followed by `vagrant ssh`
-- You'll now be in a shell of a virtual machine configured for this lab.
-- When you're done, if something in the lab messes up, or you just want to restart from scratch, type `exit` in the terminal to leave the SSH connection and run `vagrant destroy` from the project folder 
-
 # JSON
 
 Many modern APIs return data in `JSON` (**J**ava**S**cript **O**bject **N**otation) format. This is because the most common consumer of data from those APIs in a web browser are frontend applications written in JavaScript.

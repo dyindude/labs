@@ -2,12 +2,6 @@
 
 In this lab we'll learn about covering the basics about different ways you can handle persistence of data with Docker containers using `volumes`.
 
-# Setup
-- If you haven't already, follow the instructions in https://github.com/dyindude/vagrant-lab to install VirtualBox and Vagrant
-- Download a copy of this repo, navigate to its folder and run `vagrant up`, followed by `vagrant ssh`
-- You'll now be in a shell of a virtual machine configured for this lab.
-- When you're done, if something in the lab messes up, or you just want to restart from scratch, type `exit` in the terminal to leave the SSH connection and run `vagrant destroy` from the project folder
-
 # About data persistence in Docker
 By default, containers only have ephemeral storage that is available to them while the container is running. When the container is stopped or destroyed, changes to data within the container are destroyed along with it.
 
