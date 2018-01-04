@@ -6,8 +6,6 @@
 - glue records? (more advanced topic, we haven't gotten to setting up a real domain yet)
   - for using ns1.example.com as authoritative for example.com, get out of the circular dependency of figuring out wtf server do I get DNS from?
   - https://serverfault.com/questions/309622/what-is-a-glue-record
-- reverse dns (maybe another 2xx lab for this)
-- 
 
 
 - master/slave dns servers
